@@ -88,10 +88,9 @@ button { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bol
         </div>
     </div>
 
-    <!-- إدارة الجامعات والكليات والتخصصات المترابطة -->
+    <!-- إدارة الجامعات والكليات والتخصصات (إضافة) -->
     <div class="glass-panel">
-        <h2>إدارة الأكاديميات (الجامعات والكليات والتخصصات) 🏛️</h2>
-        
+        <h2>إضافة أو تحديث أكاديمي 🏛️</h2>
         <div class="form-group">
             <label>1. اختر الجامعة أو أضف جديدة</label>
             <select id="admin-uni-select" onchange="onAdminUniChange()">
@@ -119,11 +118,39 @@ button { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bol
         </div>
 
         <div class="form-group">
-            <label>3. التخصصات (اكتب التخصص واضغط إضافة أو افصل بينها بفواصل , )</label>
+            <label>3. التخصصات (افصل بينها بفواصل , )</label>
             <input type="text" id="admin-majors-input" placeholder="هندسة ميكانيكية, هندسة مدنية">
         </div>
 
         <button class="btn-primary" onclick="saveAdminHierarchy()">حفظ وإضافة للنظام 💾</button>
+    </div>
+
+    <!-- قسم الحذف (جامعة / كلية / تخصص) -->
+    <div class="glass-panel" style="border-color: rgba(239, 68, 68, 0.3);">
+        <h2 style="color: var(--danger);">حذف جامعة أو كلية أو تخصص 🗑️</h2>
+        
+        <div class="form-group">
+            <label>اختر الجامعة</label>
+            <select id="del-uni-select" onchange="onDelUniChange()">
+                <option value="">-- اختر الجامعة --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>اختر الكلية (اختياري إذا أردت حذف الكلية فقط)</label>
+            <select id="del-college-select" onchange="onDelCollegeChange()" disabled>
+                <option value="">-- اختر الكلية --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>اختر التخصص (اختياري إذا أردت حذف تخصص معين فقط)</label>
+            <select id="del-major-select" disabled>
+                <option value="">-- اختر التخصص --</option>
+            </select>
+        </div>
+
+        <button class="btn-danger" onclick="deleteAcademicItem()">حذف المحدد من النظام ⚠️</button>
     </div>
 
     <!-- جدول المستخدمين -->
@@ -152,9 +179,9 @@ button { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bol
 <script>
 let globalUnisData = {};
 
-window.addEventListener('firebaseReady', () => { 
+window.addEventListener('firebaseReady', async () => { 
+    await loadAdminUniversities();
     loadData(); 
-    loadAdminUniversities(); 
 });
 
 function showToast(msg) {
@@ -199,7 +226,7 @@ async function loadData() {
     } catch(e) { console.error(e); }
 }
 
-// جلب الهيكلة للوحة الأدمن
+// جلب الهيكلة وتعبئة قوائم الإضافة والحذف
 async function loadAdminUniversities() {
     try {
         const docSnap = await window.getDoc(window.doc(window.db, "settings", "universities"));
@@ -213,14 +240,25 @@ async function loadAdminUniversities() {
             };
         }
         
+        // تعبئة قوائم الإضافة
         const uniSelect = document.getElementById('admin-uni-select');
         uniSelect.innerHTML = '<option value="">-- اختر جامعة أو أضف جديدة --</option><option value="__NEW__">➕ إضافة جامعة جديدة...</option>';
-        for(let u in globalUnisData) {
-            uniSelect.innerHTML += `<option value="${u}">${u}</option>`;
-        }
+        for(let u in globalUnisData) { uniSelect.innerHTML += `<option value="${u}">${u}</option>`; }
+
+        // تعبئة قوائم الحذف
+        const delUniSelect = document.getElementById('del-uni-select');
+        delUniSelect.innerHTML = '<option value="">-- اختر الجامعة للحذف --</option>';
+        for(let u in globalUnisData) { delUniSelect.innerHTML += `<option value="${u}">${u}</option>`; }
+
+        document.getElementById('del-college-select').innerHTML = '<option value="">-- اختر الكلية --</option>';
+        document.getElementById('del-college-select').disabled = true;
+        document.getElementById('del-major-select').innerHTML = '<option value="">-- اختر التخصص --</option>';
+        document.getElementById('del-major-select').disabled = true;
+
     } catch(e) { console.error(e); }
 }
 
+// تفاعلات قوائم الإضافة
 window.onAdminUniChange = function() {
     const val = document.getElementById('admin-uni-select').value;
     const newUniGroup = document.getElementById('new-uni-group');
@@ -236,9 +274,7 @@ window.onAdminUniChange = function() {
         document.getElementById('new-college-group').style.display = 'none';
         if(val && globalUnisData[val]) {
             collegeSelect.innerHTML = '<option value="">-- اختر الكلية --</option><option value="__NEW__">➕ إضافة كلية جديدة...</option>';
-            for(let c in globalUnisData[val]) {
-                collegeSelect.innerHTML += `<option value="${c}">${c}</option>`;
-            }
+            for(let c in globalUnisData[val]) { collegeSelect.innerHTML += `<option value="${c}">${c}</option>`; }
             collegeSelect.disabled = false;
         } else {
             collegeSelect.innerHTML = '<option value="">-- اختر الجامعة أولاً --</option>';
@@ -250,27 +286,49 @@ window.onAdminUniChange = function() {
 window.onAdminCollegeChange = function() {
     const val = document.getElementById('admin-college-select').value;
     const newCollegeGroup = document.getElementById('new-college-group');
-    if(val === '__NEW__') {
-        newCollegeGroup.style.display = 'block';
-    } else {
-        newCollegeGroup.style.display = 'none';
+    if(val === '__NEW__') { newCollegeGroup.style.display = 'block'; } else { newCollegeGroup.style.display = 'none'; }
+}
+
+// تفاعلات قوائم الحذف
+window.onDelUniChange = function() {
+    const uni = document.getElementById('del-uni-select').value;
+    const colSelect = document.getElementById('del-college-select');
+    const majSelect = document.getElementById('del-major-select');
+    
+    colSelect.innerHTML = '<option value="">-- اختر الكلية --</option>';
+    majSelect.innerHTML = '<option value="">-- اختر التخصص --</option>';
+    colSelect.disabled = true; majSelect.disabled = true;
+
+    if(uni && globalUnisData[uni]) {
+        for(let c in globalUnisData[uni]) { colSelect.innerHTML += `<option value="${c}">${c}</option>`; }
+        colSelect.disabled = false;
     }
 }
 
-// حفظ الإضافات في فايربيس
+window.onDelCollegeChange = function() {
+    const uni = document.getElementById('del-uni-select').value;
+    const col = document.getElementById('del-college-select').value;
+    const majSelect = document.getElementById('del-major-select');
+    
+    majSelect.innerHTML = '<option value="">-- اختر التخصص --</option>';
+    majSelect.disabled = true;
+
+    if(uni && col && globalUnisData[uni][col]) {
+        const majors = globalUnisData[uni][col];
+        majors.forEach(m => { majSelect.innerHTML += `<option value="${m}">${m}</option>`; });
+        majSelect.disabled = false;
+    }
+}
+
+// حفظ الإضافات
 window.saveAdminHierarchy = async function() {
     let uni = document.getElementById('admin-uni-select').value;
-    if(uni === '__NEW__') {
-        uni = document.getElementById('new-uni-name').value.trim();
-    }
+    if(uni === '__NEW__') { uni = document.getElementById('new-uni-name').value.trim(); }
 
     let college = document.getElementById('admin-college-select').value;
-    if(college === '__NEW__' || document.getElementById('new-college-group').style.display === 'block') {
-        college = document.getElementById('new-college-name').value.trim();
-    }
+    if(college === '__NEW__' || document.getElementById('new-college-group').style.display === 'block') { college = document.getElementById('new-college-name').value.trim(); }
 
     const majorsInput = document.getElementById('admin-majors-input').value.trim();
-
     if(!uni || !college || !majorsInput) return alert('يرجى اختيار/إكمال بيانات الجامعة والكلية والتخصصات!');
 
     const newMajors = majorsInput.split(',').map(m => m.trim()).filter(m => m.length > 0);
@@ -279,22 +337,48 @@ window.saveAdminHierarchy = async function() {
         if(!globalUnisData[uni]) globalUnisData[uni] = {};
         if(!globalUnisData[uni][college]) globalUnisData[uni][college] = [];
 
-        // دمج التخصصات الجديدة مع القديمة بدون تكرار
         let existingMajors = globalUnisData[uni][college];
-        newMajors.forEach(m => {
-            if(!existingMajors.includes(m)) existingMajors.push(m);
-        });
+        newMajors.forEach(m => { if(!existingMajors.includes(m)) existingMajors.push(m); });
 
         await window.setDoc(window.doc(window.db, "settings", "universities"), globalUnisData);
-        showToast('تم حفظ التحديثات وإضافتها بنجاح لجميع الطلاب! 🎓');
+        showToast('تم الحفظ والإضافة بنجاح! 🎓');
 
-        // إعادة تعيين الحقول الفرعية
         document.getElementById('admin-majors-input').value = '';
         document.getElementById('new-college-name').value = '';
         loadAdminUniversities();
-    } catch(e) {
-        console.error(e);
-        alert('حدث خطأ أثناء الحفظ');
+    } catch(e) { console.error(e); alert('حدث خطأ أثناء الحفظ'); }
+}
+
+// تنفيذ عملية الحذف بناءً على ما قام المشرف بتحديده
+window.deleteAcademicItem = async function() {
+    const uni = document.getElementById('del-uni-select').value;
+    const col = document.getElementById('del-college-select').value;
+    const maj = document.getElementById('del-major-select').value;
+
+    if(!uni) return alert('يرجى اختيار الجامعة على الأقل!');
+
+    if(confirm('هل أنت متأكد من تنفيذ عملية الحذف؟')) {
+        try {
+            if(uni && col && maj) {
+                // حالة 1: حذف تخصص محدد فقط
+                globalUnisData[uni][col] = globalUnisData[uni][col].filter(m => m !== maj);
+                showToast(`تم حذف التخصص (${maj}) بنجاح 🗑️`);
+            } else if(uni && col && !maj) {
+                // حالة 2: حذف كلية كاملة مع تخصصاتها
+                delete globalUnisData[uni][col];
+                showToast(`تم حذف الكلية (${col}) بنجاح 🗑️`);
+            } else if(uni && !col && !maj) {
+                // حالة 3: حذف جامعة كاملة بكل كلياتها
+                delete globalUnisData[uni];
+                showToast(`تم حذف الجامعة (${uni}) بنجاح 🗑️`);
+            }
+
+            await window.setDoc(window.doc(window.db, "settings", "universities"), globalUnisData);
+            loadAdminUniversities(); // تحديث القوائم
+        } catch(e) {
+            console.error(e);
+            alert('حدث خطأ أثناء الحذف');
+        }
     }
 }
 
