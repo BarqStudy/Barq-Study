@@ -30,180 +30,89 @@ window.dispatchEvent(new Event('firebaseReady'));
 </script>
 
 <style>
-/* ================== المتغيرات والألوان للوضع الليلي (الافتراضي) ================== */
 :root {
-    --primary: #2563EB;
-    --primary-glow: rgba(37, 99, 235, 0.6);
-    --bg-color: #0B1120;
-    
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-blur: blur(20px);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); 
-    
-    --text-main: #F3F4F6;
-    --text-muted: #9CA3AF;
-    --danger: #EF4444;
-    
-    --input-bg: rgba(255, 255, 255, 0.03);
-    --item-bg: rgba(255, 255, 255, 0.04);
-    --item-border: rgba(255, 255, 255, 0.05);
-    --nav-bg: rgba(11, 17, 32, 0.7);
-    --ambient-opacity: 0.5;
-
-    --base-font-size: 15px;
-    --card-radius: 24px;
+    --primary: #2563EB; --primary-glow: rgba(37, 99, 235, 0.6); --bg-color: #0B1120;
+    --glass-bg: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); --glass-blur: blur(20px); --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); 
+    --text-main: #F3F4F6; --text-muted: #9CA3AF; --danger: #EF4444;
+    --input-bg: rgba(255, 255, 255, 0.03); --item-bg: rgba(255, 255, 255, 0.04); --item-border: rgba(255, 255, 255, 0.05); --nav-bg: rgba(11, 17, 32, 0.7); --ambient-opacity: 0.5;
+    --base-font-size: 15px; --card-radius: 24px;
 }
-
-/* ================== المتغيرات والألوان للوضع النهاري ================== */
 [data-theme="light"] {
-    --primary: #2563EB;
-    --primary-glow: rgba(37, 99, 235, 0.3);
-    --bg-color: #F0F4F8;
-    
-    --glass-bg: rgba(255, 255, 255, 0.6);
-    --glass-border: rgba(0, 0, 0, 0.08);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-    
-    --text-main: #1E293B;
-    --text-muted: #64748B;
-    
-    --input-bg: rgba(255, 255, 255, 0.9);
-    --item-bg: rgba(255, 255, 255, 0.8);
-    --item-border: rgba(0, 0, 0, 0.06);
-    --nav-bg: rgba(255, 255, 255, 0.85);
-    --ambient-opacity: 0.8;
+    --primary: #2563EB; --primary-glow: rgba(37, 99, 235, 0.3); --bg-color: #F0F4F8;
+    --glass-bg: rgba(255, 255, 255, 0.6); --glass-border: rgba(0, 0, 0, 0.08); --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    --text-main: #1E293B; --text-muted: #64748B;
+    --input-bg: rgba(255, 255, 255, 0.9); --item-bg: rgba(255, 255, 255, 0.8); --item-border: rgba(0, 0, 0, 0.06); --nav-bg: rgba(255, 255, 255, 0.85); --ambient-opacity: 0.8;
 }
-
 * { margin:0; padding:0; box-sizing:border-box; font-family:'IBM Plex Sans Arabic',sans-serif; -webkit-tap-highlight-color: transparent; }
 html { font-size: var(--base-font-size); }
 body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; min-height: 100vh; position: relative; transition: background-color 0.4s, color 0.4s; }
 
-/* الكرات المضيئة والشعار */
 .ambient-light { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: var(--ambient-opacity); animation: floatGlow 10s infinite alternate ease-in-out; pointer-events: none; transition: 0.4s; }
 .light-1 { top: -10%; right: -10%; width: 300px; height: 300px; background: rgba(37, 99, 235, 0.2); }
 .light-2 { bottom: -10%; left: -10%; width: 400px; height: 400px; background: rgba(255, 215, 0, 0.15); }
 @keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-30px, 30px) scale(1.2); } }
 
-.app-logo {
-    width: 80px; height: 80px; margin: 0 auto 10px; display: block;
-    filter: drop-shadow(0 0 15px var(--primary-glow)); transition: all 0.3s;
-}
-
-/* نظام الصفحات */
+.app-logo { width: 80px; height: 80px; margin: 0 auto 10px; display: block; filter: drop-shadow(0 0 15px var(--primary-glow)); transition: all 0.3s; }
 .page-screen { position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; padding: 20px 20px 100px 20px; display: none; flex-direction: column; align-items: center; }
 .page-screen.active { display: flex; }
 
-/* التأثيرات الزجاجية */
-.glass-card {
-    width: 100%; max-width: 440px; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border); border-radius: var(--card-radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--glass-shadow);
-    transition: transform 0.3s, background 0.4s, border-color 0.4s; position: relative;
-}
-
-/* الأيقونات 3D */
-.icon-3d { display: inline-block; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.4)) drop-shadow(0 -1px 2px rgba(255,255,255,0.2)); transition: transform 0.3s; font-style: normal; }
-.glass-card:hover .icon-3d { transform: scale(1.1) translateY(-3px); }
-
-/* النصوص */
-h1, h2, h3, h4 { color: var(--text-main); font-weight:800; margin-bottom:12px; text-align: center; transition: color 0.4s; }
+.glass-card { width: 100%; max-width: 440px; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--card-radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--glass-shadow); transition: transform 0.3s; position: relative; }
+.icon-3d { display: inline-block; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.4)); font-style: normal; }
+h1, h2, h3, h4 { color: var(--text-main); font-weight:800; margin-bottom:12px; text-align: center; }
 h4 { text-align: right; color: var(--primary); margin-top: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; }
 .accent-text { color: var(--primary); } 
-.subtitle { color: var(--text-muted); font-size:0.9rem; font-weight: 500; text-align: center; transition: color 0.4s; }
+.subtitle { color: var(--text-muted); font-size:0.9rem; font-weight: 500; text-align: center; }
 
-/* الحقول والإدخالات */
 .form-group { margin-bottom:18px; width: 100%; text-align: right; }
 label { display:block; margin-bottom:8px; font-size:0.95rem; font-weight:700; color: var(--text-muted); }
 .field-hint { display:block; margin-top:5px; font-size:0.75rem; color: var(--primary); text-align: right;}
 
-select, input[type="text"], input[type="number"], input[type="email"], input[type="tel"] {
-    width:100%; padding:14px; border-radius: 16px; border: 1px solid var(--glass-border);
-    background: var(--input-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    color: var(--text-main); font-size:1rem; transition: all 0.3s;
-}
+select, input[type="text"], input[type="number"], input[type="email"], input[type="tel"] { width:100%; padding:14px; border-radius: 16px; border: 1px solid var(--glass-border); background: var(--input-bg); color: var(--text-main); font-size:1rem; appearance: none; }
 select:focus, input:focus { outline:none; border-color: var(--primary); background: var(--item-bg); box-shadow: 0 0 10px var(--primary-glow); }
 select option { background: var(--bg-color); color: var(--text-main); }
-input:disabled { opacity: 0.6; cursor: not-allowed; }
+input:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
 input[type="range"] { width: 100%; accent-color: var(--primary); }
 
-/* الأزرار */
-button {
-    width:100%; padding:16px; border-radius: 18px; border:none; background: var(--primary);
-    color: #fff; font-size:1.05rem; font-weight:800; cursor:pointer; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2); transition: all 0.2s;
-}
+button { width:100%; padding:16px; border-radius: 18px; border:none; background: var(--primary); color: #fff; font-size:1.05rem; font-weight:800; cursor:pointer; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2); transition: all 0.2s; }
 button:active { transform: scale(0.96); }
 button:hover { filter: brightness(1.1); }
-.btn-secondary { background: var(--item-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: none; }
+.btn-secondary { background: var(--item-bg); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: none; }
 .btn-danger { background: var(--danger); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
 .btn-small { padding: 10px 15px; border-radius: 12px; font-size: 0.9rem; width: auto; }
 
-/* أزرار عائمة */
-.btn-floating {
-    position: absolute; top: 15px; z-index: 10; width: 45px; height: 45px;
-    border-radius: 50%; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; box-shadow: var(--glass-shadow); padding: 0; transition: all 0.2s; font-size: 1.2rem; color: var(--text-main);
-}
-.btn-floating:hover { background: var(--item-bg); transform: scale(1.05); }
-.btn-back { right: 15px; }
-.btn-theme { left: 15px; }
+.btn-floating { position: absolute; top: 15px; z-index: 10; width: 45px; height: 45px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: var(--text-main); }
+.btn-back { right: 15px; } .btn-theme { left: 15px; }
 
-/* شريط التنقل السفلي */
-.bottom-nav {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 440px; border-radius: 24px;
-    background: var(--nav-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-    border: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 12px 5px; z-index: 100; box-shadow: var(--glass-shadow); transition: background 0.4s;
-    display: none; /* مخفي افتراضياً حتى يسجل الطالب */
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; transition: all 0.3s; font-size: 0.75rem; font-weight: 700; width: 20%; }
-.nav-item .icon-3d { font-size: 1.6rem; }
-.nav-item.active { color: var(--primary); transform: translateY(-4px); }
+.bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 440px; border-radius: 24px; background: var(--nav-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 12px 5px; z-index: 100; box-shadow: var(--glass-shadow); display: none; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; font-weight: 700; width: 20%; }
+.nav-item .icon-3d { font-size: 1.6rem; } .nav-item.active { color: var(--primary); transform: translateY(-4px); }
 
-/* القوائم والتقدم */
 .menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; width: 100%; max-width: 440px; }
 .menu-btn { display:flex; flex-direction:column; align-items:center; justify-content: center; gap:12px; padding: 20px 10px; border-radius: 20px; }
-
 .toggle-group { display:flex; gap:10px; margin-bottom:18px; width: 100%; }
-.toggle-btn { flex:1; padding:12px; border-radius:14px; border:1px solid var(--glass-border); background: var(--item-bg); color: var(--text-muted); font-weight:700; cursor:pointer; font-size: 0.9rem; backdrop-filter: blur(10px); }
+.toggle-btn { flex:1; padding:12px; border-radius:14px; border:1px solid var(--glass-border); background: var(--item-bg); color: var(--text-muted); font-weight:700; cursor:pointer; font-size: 0.9rem; }
 .toggle-btn.active { background: var(--primary); color:#fff; border-color: var(--primary); }
 
-.progress-container { width: 100%; background: var(--input-bg); border-radius: 20px; height: 14px; margin-top: 15px; overflow: hidden; border: 1px solid var(--item-border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+.progress-container { width: 100%; background: var(--input-bg); border-radius: 20px; height: 14px; margin-top: 15px; overflow: hidden; border: 1px solid var(--item-border); }
 .progress-bar { height: 100%; background: linear-gradient(90deg, #3B82F6, #60A5FA); width: 0%; transition: width 0.8s; border-radius: 20px; }
 
-/* الجدول الدراسي والشباتر */
 .schedule-tabs { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 15px; padding-bottom: 8px; width: 100%; }
-.schedule-tabs::-webkit-scrollbar { height: 4px; }
-.schedule-tabs::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
-.tab-btn { flex: 0 0 auto; width: auto; padding: 8px 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--item-bg); color: var(--text-main); font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
-.tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+.tab-btn { flex: 0 0 auto; width: auto; padding: 8px 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--item-bg); color: var(--text-main); font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+.tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-.day-card, .list-card { background: var(--item-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px; margin-bottom: 15px; text-align: right; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: background 0.4s; }
+.day-card, .list-card { background: var(--item-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px; margin-bottom: 15px; text-align: right; }
 .course-badge { background: rgba(37, 99, 235, 0.15); border: 1px solid rgba(37, 99, 235, 0.3); color: var(--primary); padding: 10px; border-radius: 12px; display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold;}
 
-/* نافذة تم الحفظ المنبثقة (Toast) */
-.toast-msg {
-    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(50px);
-    background: rgba(16, 185, 129, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    color: #fff; padding: 12px 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2);
-    font-weight: 700; font-size: 0.95rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999;
-}
+.toast-msg { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(50px); background: rgba(16, 185, 129, 0.9); color: #fff; padding: 12px 24px; border-radius: 16px; font-weight: 700; opacity: 0; pointer-events: none; transition: all 0.4s; z-index: 9999; }
 .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-/* أنيميشن */
-.slide-in { animation: slideIn 0.4s ease-out forwards; }
-@keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 .pulse-anim { animation: pulse 2s infinite ease-in-out; }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); filter: drop-shadow(0 0 20px var(--primary-glow)); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 </style>
 </head>
 <body>
 
-<!-- الكرات المضيئة في الخلفية -->
 <div class="ambient-light light-1"></div>
 <div class="ambient-light light-2"></div>
-
-<!-- نافذة التنبيه (Toast) -->
 <div id="toast-msg" class="toast-msg">تم الحفظ بنجاح ✅</div>
 
 <!-- 1. شاشة التحميل -->
@@ -224,44 +133,17 @@ button:hover { filter: brightness(1.1); }
         </svg>
         <h1>برق <span class="accent-text">المتعلم</span></h1>
         
-        <div class="form-group">
-            <label>👤 اسمك الأول</label>
-            <input type="text" id="name-input" placeholder="اسمك">
-            <span class="field-hint">سيظهر للجميع في حال كنت من التوب 10</span>
-        </div>
-        <div class="form-group">
-            <label>🎓 الكلية (جامعة نجران)</label>
-            <select id="college-input">
-                <option value="">-- اختر كليتك --</option>
-                <option value="الهندسة">الهندسة</option>
-                <option value="علوم الحاسب ونظم المعلومات">علوم الحاسب ونظم المعلومات</option>
-                <option value="الطب">الطب</option>
-                <option value="طب الأسنان">طب الأسنان</option>
-                <option value="الصيدلة">الصيدلة</option>
-                <option value="العلوم الطبية التطبيقية">العلوم الطبية التطبيقية</option>
-                <option value="التمريض">التمريض</option>
-                <option value="العلوم">العلوم</option>
-                <option value="إدارة الأعمال">إدارة الأعمال</option>
-                <option value="الشريعة وأصول الدين">الشريعة وأصول الدين</option>
-                <option value="التربية">التربية</option>
-                <option value="اللغات والترجمة">اللغات والترجمة</option>
-                <option value="الآداب والعلوم الإنسانية">الآداب والعلوم الإنسانية</option>
-                <option value="الكلية التطبيقية">الكلية التطبيقية</option>
-            </select>
-        </div>
-        <div class="form-group"><label>📚 التخصص</label><input type="text" id="major-input" placeholder="مثال: هندسة ميكانيكية"></div>
-        <div class="form-group">
-            <label>@ معرفك (يوزر التيليجرام)</label>
-            <input type="text" id="setup-handle" disabled>
-            <span class="field-hint">يتم سحبه وتحديثه تلقائياً</span>
-        </div>
+        <div class="form-group"><label>👤 اسمك الأول</label><input type="text" id="name-input" placeholder="اسمك"></div>
+        <div class="form-group"><label>🏫 الجامعة</label><select id="university-input"><option value="">-- جاري التحميل --</option></select></div>
+        <div class="form-group"><label>🎓 الكلية</label><select id="college-input" disabled><option value="">-- اختر الجامعة أولاً --</option></select></div>
+        <div class="form-group"><label>📚 التخصص</label><select id="major-input" disabled><option value="">-- اختر الكلية أولاً --</option></select></div>
+        <div class="form-group"><label>@ معرفك</label><input type="text" id="setup-handle" disabled></div>
         <button id="save-btn" style="margin-top: 15px;">انطلق للقمة 🚀</button>
     </div>
 </div>
 
 <!-- 3. الرئيسية -->
 <div id="main-screen" class="page-screen slide-in" style="padding-top: 50px;">
-    
     <button class="btn-floating btn-theme" onclick="toggleTheme()"><span class="icon-3d" id="theme-icon">☀️</span></button>
 
     <div id="user-header" style="text-align: center; margin-bottom: 25px; width: 100%;">
@@ -276,7 +158,7 @@ button:hover { filter: brightness(1.1); }
     <div class="glass-card" style="display:flex; align-items:center; justify-content:space-between; padding: 24px;">
         <div>
             <h3 style="margin:0; font-size:1.3rem; text-align:right;">أيام الاستمرارية</h3>
-            <p class="subtitle" style="text-align:right; margin-top:4px;">انجز مهامك يومياً لزيادة الحماس!</p>
+            <p class="subtitle" style="text-align:right; margin-top:4px;">انجز مهامك يومياً!</p>
         </div>
         <div style="text-align:center;">
             <div class="icon-3d pulse-anim" style="font-size:2.5rem; margin-bottom:5px;">🔥</div>
@@ -306,18 +188,10 @@ button:hover { filter: brightness(1.1); }
     </div>
 
     <div class="menu-grid">
-        <button class="btn-secondary menu-btn" onclick="openPomodoro()">
-            <div class="icon-3d" style="font-size: 2.2rem;">⏳</div><span style="font-weight:700;">جلسة تركيز</span>
-        </button>
-        <button class="btn-secondary menu-btn" onclick="openAccumulation()">
-            <div class="icon-3d" style="font-size: 2.2rem;">📑</div><span style="font-weight:700;">لا للتسويف</span>
-        </button>
-        <button class="btn-secondary menu-btn" onclick="navTo('schedule-screen', 'nav-schedule'); toggleScheduleMode('view');">
-            <div class="icon-3d" style="font-size: 2.2rem;">📅</div><span style="font-weight:700;">الجدول الدراسي</span>
-        </button>
-        <button class="btn-secondary menu-btn" onclick="navTo('gpa-screen')">
-            <div class="icon-3d" style="font-size: 2.2rem;">📊</div><span style="font-weight:700;">حاسبة المعدل</span>
-        </button>
+        <button class="btn-secondary menu-btn" onclick="openPomodoro()"><div class="icon-3d" style="font-size: 2.2rem;">⏳</div><span>جلسة تركيز</span></button>
+        <button class="btn-secondary menu-btn" onclick="openAccumulation()"><div class="icon-3d" style="font-size: 2.2rem;">📑</div><span>لا للتسويف</span></button>
+        <button class="btn-secondary menu-btn" onclick="navTo('schedule-screen', 'nav-schedule'); toggleScheduleMode('view');"><div class="icon-3d" style="font-size: 2.2rem;">📅</div><span>الجدول الدراسي</span></button>
+        <button class="btn-secondary menu-btn" onclick="navTo('gpa-screen')"><div class="icon-3d" style="font-size: 2.2rem;">📊</div><span>حاسبة المعدل</span></button>
     </div>
 </div>
 
@@ -327,13 +201,11 @@ button:hover { filter: brightness(1.1); }
     <div class="glass-card" style="margin-top: 15px;">
         <div class="icon-3d" style="font-size: 3.5rem; display:block; text-align:center; margin-bottom:10px;">📑</div>
         <h1>لا <span class="accent-text">للتسويف</span></h1>
-        
         <div id="acc-list-view" style="width: 100%;">
             <div id="acc-global-progress" style="width: 100%;"></div>
             <button class="btn-secondary" style="margin-bottom:15px; border-style:dashed;" onclick="toggleAcc('form')">+ أضف مادة</button>
             <div id="saved-courses-list" style="width: 100%;"></div>
         </div>
-
         <div id="acc-form-view" style="display:none; width: 100%;">
             <div class="form-group"><label>📘 اسم المادة</label><input type="text" id="acc-course" placeholder="مثال: ديناميكا"></div>
             <div class="form-group"><label>📑 عدد الشباتر</label><input type="number" id="acc-chapters" placeholder="مثال: 5" min="1"></div>
@@ -342,7 +214,6 @@ button:hover { filter: brightness(1.1); }
             <button onclick="generatePlan()">إنشاء الخطة</button>
             <button class="btn-secondary" style="margin-top:10px;" onclick="toggleAcc('list')">إلغاء</button>
         </div>
-
         <div id="acc-plan-result" style="display:none; width: 100%;"></div>
     </div>
 </div>
@@ -353,14 +224,11 @@ button:hover { filter: brightness(1.1); }
     <div class="glass-card" style="margin-top:15px; text-align:center;">
         <div class="icon-3d" style="font-size: 3.5rem; margin-bottom:10px;">📅</div>
         <h1>الجدول <span class="accent-text">الدراسي</span></h1>
-        
         <div class="toggle-group" style="margin-top:20px;">
             <button type="button" class="toggle-btn active" id="sch-view-btn" onclick="toggleScheduleMode('view')">عرض الجدول</button>
             <button type="button" class="toggle-btn" id="sch-edit-btn" onclick="toggleScheduleMode('edit')">تعديل</button>
         </div>
-        
         <div id="sch-view-mode" style="text-align:right; width: 100%;"></div>
-        
         <div id="sch-edit-mode" style="display:none; text-align:right;">
             <div class="form-group">
                 <label>اختر اليوم:</label>
@@ -424,9 +292,7 @@ button:hover { filter: brightness(1.1); }
         <h2 id="timer-title" style="font-size:1.6rem;">مذاكرة عميقة...</h2>
         <div id="timer-icon" class="icon-3d pulse-anim" style="font-size: 5rem; margin:25px 0;">⏳</div>
         <div class="accent-text" style="font-size:5rem; font-weight:900; font-variant-numeric:tabular-nums;" id="timer-display">25:00</div>
-        
         <button class="btn-secondary btn-small" id="skip-break-btn" style="display:none; margin:15px auto 0;" onclick="skipBreak()">⏭️ تخطي الاستراحة وإنهاء</button>
-        
         <div style="display:flex; gap:15px; margin-top:25px;">
             <button class="btn-secondary" id="pause-btn" onclick="togglePause()">⏸️ إيقاف</button>
             <button class="btn-danger" onclick="stopFocusTimer(true)">⏹️ إنهاء الجلسة</button>
@@ -434,7 +300,7 @@ button:hover { filter: brightness(1.1); }
     </div>
 </div>
 
-<!-- 8. الترتيب (لوحة الشرف) -->
+<!-- 8. الترتيب -->
 <div id="leaderboard-screen" class="page-screen slide-in">
     <div class="glass-card" style="margin-top:15px;">
         <div class="icon-3d" style="font-size: 3.5rem; display:block; text-align:center; margin-bottom:10px;">🏆</div>
@@ -443,26 +309,23 @@ button:hover { filter: brightness(1.1); }
     </div>
 </div>
 
-<!-- 9. الملف الشخصي المقسم 3 أقسام -->
+<!-- 9. الملف الشخصي -->
 <div id="profile-screen" class="page-screen slide-in">
     <div class="glass-card" style="margin-top:15px; padding-top:30px;">
         <div class="icon-3d" style="font-size: 3.5rem; display:block; text-align:center; margin-bottom:10px;">👤</div>
         <h1>ملفي <span class="accent-text">الشخصي</span></h1>
         
-        <!-- القسم الأول: البيانات الشخصية -->
         <h4>البيانات الشخصية</h4>
-        <div class="form-group">
-            <label>@ معرفك (غير قابل للتعديل)</label>
-            <input type="text" id="prof-handle" disabled>
-        </div>
+        <div class="form-group"><label>@ معرفك</label><input type="text" id="prof-handle" disabled></div>
         <div class="form-group"><label>الاسم</label><input type="text" id="prof-name"></div>
-        <div class="form-group"><label>التخصص</label><input type="text" id="prof-major"></div>
+        <div class="form-group"><label>الجامعة</label><select id="prof-uni"></select></div>
+        <div class="form-group"><label>الكلية</label><select id="prof-college"></select></div>
+        <div class="form-group"><label>التخصص</label><select id="prof-major"></select></div>
         <div class="form-group"><label>الجنس</label><select id="prof-gender"><option value="">-- غير محدد --</option><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select></div>
         <div class="form-group"><label>رقم الجوال</label><input type="tel" id="prof-phone" placeholder="05XXXXXXXX"></div>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="prof-email" placeholder="example@email.com"></div>
         <button onclick="saveProfile()" style="margin-bottom:15px;">حفظ البيانات</button>
 
-        <!-- القسم الثاني: الإعدادات -->
         <h4>الإعدادات</h4>
         <div class="form-group" style="text-align: right; margin-bottom: 25px;">
             <label>حجم الخط</label>
@@ -473,16 +336,13 @@ button:hover { filter: brightness(1.1); }
             </div>
         </div>
 
-        <!-- القسم الثالث: تواصل وتسجيل خروج -->
         <h4>تواصل معنا</h4>
-        <p class="subtitle" style="text-align: right; margin-bottom: 10px;">يسعدنا تواصلك لاقتراح ميزات جديدة لتطوير المنصة.</p>
         <button class="btn-secondary" onclick="window.open('https://t.me/Roman_1ME', '_blank')" style="margin-bottom:15px; border-color:var(--primary); color:var(--primary);">💬 تواصل مع المطور</button>
-        
         <button class="btn-danger" onclick="logout()">🚪 تسجيل الخروج</button>
     </div>
 </div>
 
-<!-- البار السفلي الدائم -->
+<!-- البار السفلي -->
 <div class="bottom-nav" id="main-bottom-nav">
     <div class="nav-item active" id="nav-home" onclick="navTo('main-screen', 'nav-home')"><div class="icon-3d">🏠</div><span>الرئيسية</span></div>
     <div class="nav-item" id="nav-schedule" onclick="navTo('schedule-screen', 'nav-schedule'); toggleScheduleMode('view');"><div class="icon-3d">📅</div><span>الجدول</span></div>
@@ -491,12 +351,11 @@ button:hover { filter: brightness(1.1); }
 </div>
 
 <script>
-// ================= المتغيرات الأساسية =================
 const ADMIN_ID = "791769102695"; 
 let currentUserId = null, currentUserData = null;
 let telegramUsername = "";
+let universitiesData = {}; // ستجلب من Firebase
 
-// أسماء حماسية وتفاعلية للمستويات
 const FOCUS_LEVELS = [
     { hours: 0, icon: '⚡', name: 'شرارة البداية' }, { hours: 10, icon: '🔥', name: 'شعلة الإنجاز' }, { hours: 50, icon: '💥', name: 'طاقة متفجرة' },
     { hours: 100, icon: '🧠', name: 'عقل لا يهدأ' }, { hours: 250, icon: '🦍', name: 'وحش المذاكرة' }, { hours: 450, icon: '⚙️', name: 'آلة تركيز' },
@@ -508,61 +367,100 @@ const WEEK_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأر
 let currentScheduleEdit = {};
 let currentScheduleDay = 'الأحد'; 
 
-// متغيرات حفظ الجلسة
-let timerInt = null, totalSecs = 0, isPaused = false, studyMins = 0, breakMins = 0, isBreakPhase = false;
-let timerEndTime = 0;
-
-// متغير لحفظ حالة الملف الشخصي قبل التعديل
+let timerInt = null, totalSecs = 0, isPaused = false, studyMins = 0, breakMins = 0, isBreakPhase = false, timerEndTime = 0;
 window.profileSnapshot = "";
 
-// ================= تبديل الوضع الليلي / النهاري والخط =================
-function toggleTheme() {
-    const body = document.documentElement;
-    if(body.getAttribute('data-theme') === 'light') {
-        body.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'dark');
-        document.getElementById('theme-icon').innerText = '☀️';
-    } else {
-        body.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'light');
-        document.getElementById('theme-icon').innerText = '🌙';
+// دالة جلب بيانات الجامعات من Firebase
+async function fetchUniversitiesData() {
+    try {
+        const docSnap = await window.getDoc(window.doc(window.db, "settings", "universities"));
+        if(docSnap.exists()) {
+            universitiesData = docSnap.data();
+        } else {
+            // بيانات افتراضية أولية في حال لم تضف شيئاً بعد من لوحة الأدمن
+            universitiesData = {
+                "جامعة نجران": {
+                    "الهندسة": ["هندسة ميكانيكية", "هندسة مدنية", "هندسة كهربائية"],
+                    "علوم الحاسب ونظم المعلومات": ["علوم الحاسب", "نظم المعلومات"]
+                }
+            };
+        }
+    } catch(e) {
+        console.error(e);
     }
 }
-if(localStorage.getItem('theme') === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    window.addEventListener('DOMContentLoaded', () => { document.getElementById('theme-icon').innerText = '🌙'; });
+
+function initCascadingDropdowns(uniId, colId, majId, selectedUni = "", selectedCol = "", selectedMaj = "") {
+    const uniSelect = document.getElementById(uniId);
+    const colSelect = document.getElementById(colId);
+    const majSelect = document.getElementById(majId);
+
+    uniSelect.innerHTML = '<option value="">-- اختر جامعتك --</option>';
+    for(let uni in universitiesData) {
+        uniSelect.innerHTML += `<option value="${uni}" ${uni === selectedUni ? 'selected' : ''}>${uni}</option>`;
+    }
+
+    function updateColleges(uniValue, colValue = "") {
+        colSelect.innerHTML = '<option value="">-- اختر الكلية --</option>';
+        majSelect.innerHTML = '<option value="">-- اختر التخصص --</option>';
+        colSelect.disabled = true; majSelect.disabled = true;
+
+        if(uniValue && universitiesData[uniValue]) {
+            for(let col in universitiesData[uniValue]) {
+                colSelect.innerHTML += `<option value="${col}" ${col === colValue ? 'selected' : ''}>${col}</option>`;
+            }
+            colSelect.disabled = false;
+        }
+    }
+
+    function updateMajors(uniValue, colValue, majValue = "") {
+        majSelect.innerHTML = '<option value="">-- اختر التخصص --</option>';
+        majSelect.disabled = true;
+
+        if(colValue && universitiesData[uniValue] && universitiesData[uniValue][colValue]) {
+            const majors = universitiesData[uniValue][colValue];
+            majors.forEach(m => {
+                majSelect.innerHTML += `<option value="${m}" ${m === majValue ? 'selected' : ''}>${m}</option>`;
+            });
+            majSelect.disabled = false;
+        }
+    }
+
+    uniSelect.onchange = function() { updateColleges(this.value); };
+    colSelect.onchange = function() { updateMajors(uniSelect.value, this.value); };
+
+    if(selectedUni) {
+        updateColleges(selectedUni, selectedCol);
+        if(selectedCol) { updateMajors(selectedUni, selectedCol, selectedMaj); }
+    }
 }
 
+function toggleTheme() {
+    const body = document.documentElement;
+    if(body.getAttribute('data-theme') === 'light') { body.removeAttribute('data-theme'); localStorage.setItem('theme', 'dark'); document.getElementById('theme-icon').innerText = '☀️'; } 
+    else { body.setAttribute('data-theme', 'light'); localStorage.setItem('theme', 'light'); document.getElementById('theme-icon').innerText = '🌙'; }
+}
+if(localStorage.getItem('theme') === 'light') { document.documentElement.setAttribute('data-theme', 'light'); window.addEventListener('DOMContentLoaded', () => { document.getElementById('theme-icon').innerText = '🌙'; }); }
+
 document.getElementById('font-size-slider').addEventListener('input', function() {
-    document.documentElement.style.setProperty('--base-font-size', this.value + 'px');
-    localStorage.setItem('customFontSize', this.value);
+    document.documentElement.style.setProperty('--base-font-size', this.value + 'px'); localStorage.setItem('customFontSize', this.value);
 });
 const savedFontSize = localStorage.getItem('customFontSize');
 if(savedFontSize) { document.documentElement.style.setProperty('--base-font-size', savedFontSize + 'px'); }
 
-// ================= نظام النافذة المنبثقة (Toast) =================
 window.showToast = function(msg) {
-    const toast = document.getElementById('toast-msg');
-    toast.innerText = msg || 'تم الحفظ بنجاح ✅';
-    toast.classList.add('show');
+    const toast = document.getElementById('toast-msg'); toast.innerText = msg || 'تم الحفظ بنجاح ✅'; toast.classList.add('show');
     setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
 
-// ================= التنقل =================
 function navTo(screenId, navId) {
     document.querySelectorAll('.page-screen').forEach(el => el.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-    window.scrollTo(0, 0);
-    if(navId) {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(navId).classList.add('active');
-    }
+    document.getElementById(screenId).classList.add('active'); window.scrollTo(0, 0);
+    if(navId) { document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); document.getElementById(navId).classList.add('active'); }
 }
 
-// ================= التهيئة =================
 window.addEventListener('firebaseReady', async () => {
-    let tg = window.Telegram?.WebApp; 
-    if(tg) { tg.ready(); tg.expand(); }
+    let tg = window.Telegram?.WebApp; if(tg) { tg.ready(); tg.expand(); }
     
     currentUserId = tg?.initDataUnsafe?.user?.id?.toString() || localStorage.getItem('local_uid');
     if(!currentUserId) { currentUserId = "user_" + Math.floor(Math.random() * 1000000); localStorage.setItem('local_uid', currentUserId); }
@@ -570,37 +468,31 @@ window.addEventListener('firebaseReady', async () => {
     telegramUsername = tg?.initDataUnsafe?.user?.username || "barqStudy" + Math.floor(1000 + Math.random() * 9000);
     document.getElementById('setup-handle').value = "@" + telegramUsername;
 
+    await fetchUniversitiesData();
     await checkUserData();
 });
 
-// ================= جلب البيانات والتحقق من التسجيل =================
 async function checkUserData() {
     try {
         const docSnap = await window.getDoc(window.doc(window.db, "users", currentUserId));
         if (docSnap.exists()) {
             currentUserData = docSnap.data();
             
-            // إخفاء كل شيء إذا لم يكتمل التسجيل
-            if(!currentUserData.name || !currentUserData.college || !currentUserData.major) {
+            if(!currentUserData.name || !currentUserData.university || !currentUserData.college || !currentUserData.major) {
                 document.getElementById('main-bottom-nav').style.display = 'none';
+                initCascadingDropdowns('university-input', 'college-input', 'major-input', currentUserData.university, currentUserData.college, currentUserData.major);
                 navTo('setup-screen'); return;
             }
 
-            // إظهار الشريط السفلي لأن الطالب مسجل
             document.getElementById('main-bottom-nav').style.display = 'flex';
-
             if(!currentUserData.totalFocusMins) currentUserData.totalFocusMins = 0;
             if(!currentUserData.accPlans) currentUserData.accPlans = [];
             if(!currentUserData.schedule) currentUserData.schedule = { 'الأحد':{off:true, courses:[]}, 'الإثنين':{off:true, courses:[]}, 'الثلاثاء':{off:true, courses:[]}, 'الأربعاء':{off:true, courses:[]}, 'الخميس':{off:true, courses:[]} };
-            if(currentUserData.handle !== "@" + telegramUsername) {
-                currentUserData.handle = "@" + telegramUsername;
-                await window.setDoc(window.doc(window.db, "users", currentUserId), { handle: currentUserData.handle }, {merge:true});
-            }
             
-            updateMainUI();
-            checkPersistedTimer();
+            updateMainUI(); checkPersistedTimer();
         } else { 
             document.getElementById('main-bottom-nav').style.display = 'none';
+            initCascadingDropdowns('university-input', 'college-input', 'major-input');
             navTo('setup-screen'); 
         }
     } catch(e) { console.error(e); }
@@ -608,48 +500,39 @@ async function checkUserData() {
 
 document.getElementById('save-btn').addEventListener('click', async () => {
     const name = document.getElementById('name-input').value.trim();
+    const university = document.getElementById('university-input').value;
     const college = document.getElementById('college-input').value;
-    const major = document.getElementById('major-input').value.trim();
-    if(!name || !college || !major) return showToast('يرجى تعبئة جميع البيانات!');
+    const major = document.getElementById('major-input').value;
+    
+    if(!name || !university || !college || !major) return showToast('يرجى تعبئة جميع البيانات!');
     
     currentUserData = { 
-        name, handle: "@" + telegramUsername, college, major, currentStreak: 0, totalFocusMins: 0, lastActionDateStr: null, 
+        name, handle: "@" + telegramUsername, university, college, major, currentStreak: 0, totalFocusMins: 0, lastActionDateStr: null, 
         accPlans: [], schedule: { 'الأحد':{off:true, courses:[]}, 'الإثنين':{off:true, courses:[]}, 'الثلاثاء':{off:true, courses:[]}, 'الأربعاء':{off:true, courses:[]}, 'الخميس':{off:true, courses:[]} } 
     };
     await window.setDoc(window.doc(window.db, "users", currentUserId), currentUserData);
     
-    // إظهار الشريط السفلي وتوجيه الطالب
     document.getElementById('main-bottom-nav').style.display = 'flex';
-    showToast('مرحباً بك في برق المتعلم ⚡');
-    updateMainUI();
-    navTo('main-screen', 'nav-home');
+    showToast('مرحباً بك في برق المتعلم ⚡'); updateMainUI(); navTo('main-screen', 'nav-home');
 });
 
-// ================= الستريك (يتم استدعاؤه فقط عند الإنجاز) =================
 async function incrementStreakAndCheck() {
-    const today = new Date();
-    const todayStr = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
-    
-    let lastDateStr = currentUserData.lastActionDateStr;
-    let streak = currentUserData.currentStreak || 0;
+    const today = new Date(); const todayStr = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+    let lastDateStr = currentUserData.lastActionDateStr; let streak = currentUserData.currentStreak || 0;
     
     if (lastDateStr !== todayStr) {
         const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.getFullYear() + '-' + (yesterday.getMonth()+1) + '-' + yesterday.getDate();
-        
         if (lastDateStr === yesterdayStr) { streak++; } else { streak = 1; }
         
-        currentUserData.currentStreak = streak;
-        currentUserData.lastActionDateStr = todayStr;
-        
+        currentUserData.currentStreak = streak; currentUserData.lastActionDateStr = todayStr;
         await window.setDoc(window.doc(window.db, "users", currentUserId), { currentStreak: streak, lastActionDateStr: todayStr }, {merge: true});
         document.getElementById('streak-count').innerText = streak;
     }
 }
 
 function getLevelInfo(totalHours) {
-    let currentIdx = 0;
-    for(let i = 0; i < FOCUS_LEVELS.length; i++) { if(totalHours >= FOCUS_LEVELS[i].hours) currentIdx = i; }
+    let currentIdx = 0; for(let i = 0; i < FOCUS_LEVELS.length; i++) { if(totalHours >= FOCUS_LEVELS[i].hours) currentIdx = i; }
     return { current: FOCUS_LEVELS[currentIdx], next: FOCUS_LEVELS[currentIdx + 1] || null, isMax: currentIdx === FOCUS_LEVELS.length - 1 };
 }
 
@@ -658,11 +541,9 @@ function updateMainUI() {
     document.getElementById('display-user-major').innerText = currentUserData.major || "التخصص";
     
     document.getElementById('streak-count').innerText = currentUserData.currentStreak || 0;
-    const totalHours = (currentUserData.totalFocusMins || 0) / 60;
-    const { current, next, isMax } = getLevelInfo(totalHours);
+    const totalHours = (currentUserData.totalFocusMins || 0) / 60; const { current, next, isMax } = getLevelInfo(totalHours);
 
-    document.getElementById('level-icon').innerText = current.icon;
-    document.getElementById('level-name').innerText = current.name;
+    document.getElementById('level-icon').innerText = current.icon; document.getElementById('level-name').innerText = current.name;
     document.getElementById('current-hours-text').innerText = `${totalHours.toFixed(1)} س`;
 
     if(!isMax) {
@@ -670,154 +551,68 @@ function updateMainUI() {
         document.getElementById('level-progress-bar').style.width = `${Math.min(100, Math.max(0, ((totalHours - current.hours) / (next.hours - current.hours)) * 100))}%`;
         document.getElementById('remaining-hours-text').innerText = `باقي ${(next.hours - totalHours).toFixed(1)} س`;
     } else {
-        document.getElementById('next-level-name').innerText = "تم الختم 🎉";
-        document.getElementById('level-progress-bar').style.width = '100%';
-        document.getElementById('remaining-hours-text').innerText = "أنت في القمة!";
+        document.getElementById('next-level-name').innerText = "تم الختم 🎉"; document.getElementById('level-progress-bar').style.width = '100%'; document.getElementById('remaining-hours-text').innerText = "أنت في القمة!";
     }
 }
 
-// ================= حفظ الجلسة =================
-function saveTimerState() {
-    localStorage.setItem('timerEndTime', timerEndTime);
-    localStorage.setItem('studyMins', studyMins);
-    localStorage.setItem('breakMins', breakMins);
-    localStorage.setItem('isBreakPhase', isBreakPhase);
-    localStorage.setItem('isPaused', isPaused);
-    if(isPaused) localStorage.setItem('pausedRemaining', totalSecs);
-}
-function clearTimerState() {
-    localStorage.removeItem('timerEndTime'); localStorage.removeItem('studyMins');
-    localStorage.removeItem('breakMins'); localStorage.removeItem('isBreakPhase');
-    localStorage.removeItem('isPaused'); localStorage.removeItem('pausedRemaining');
-}
+// حفظ الجلسة
+function saveTimerState() { localStorage.setItem('timerEndTime', timerEndTime); localStorage.setItem('studyMins', studyMins); localStorage.setItem('breakMins', breakMins); localStorage.setItem('isBreakPhase', isBreakPhase); localStorage.setItem('isPaused', isPaused); if(isPaused) localStorage.setItem('pausedRemaining', totalSecs); }
+function clearTimerState() { localStorage.removeItem('timerEndTime'); localStorage.removeItem('studyMins'); localStorage.removeItem('breakMins'); localStorage.removeItem('isBreakPhase'); localStorage.removeItem('isPaused'); localStorage.removeItem('pausedRemaining'); }
 
 function checkPersistedTimer() {
-    let savedEnd = localStorage.getItem('timerEndTime');
-    let savedPaused = localStorage.getItem('isPaused') === 'true';
-    
+    let savedEnd = localStorage.getItem('timerEndTime'), savedPaused = localStorage.getItem('isPaused') === 'true';
     if(savedEnd || savedPaused) {
-        studyMins = parseInt(localStorage.getItem('studyMins')) || 25;
-        breakMins = parseInt(localStorage.getItem('breakMins')) || 0;
-        isBreakPhase = localStorage.getItem('isBreakPhase') === 'true';
-        
-        if(savedPaused) {
-            isPaused = true;
-            totalSecs = parseInt(localStorage.getItem('pausedRemaining')) || 0;
-            document.getElementById('pause-btn').innerText = '▶️ إكمال';
-        } else {
-            timerEndTime = parseInt(savedEnd);
-            totalSecs = Math.round((timerEndTime - Date.now()) / 1000);
-            isPaused = false;
-            document.getElementById('pause-btn').innerText = '⏸️ إيقاف';
-        }
+        studyMins = parseInt(localStorage.getItem('studyMins')) || 25; breakMins = parseInt(localStorage.getItem('breakMins')) || 0; isBreakPhase = localStorage.getItem('isBreakPhase') === 'true';
+        if(savedPaused) { isPaused = true; totalSecs = parseInt(localStorage.getItem('pausedRemaining')) || 0; document.getElementById('pause-btn').innerText = '▶️ إكمال'; } 
+        else { timerEndTime = parseInt(savedEnd); totalSecs = Math.round((timerEndTime - Date.now()) / 1000); isPaused = false; document.getElementById('pause-btn').innerText = '⏸️ إيقاف'; }
         
         if(totalSecs > 0) {
-            if(isBreakPhase) {
-                document.getElementById('timer-title').innerText = "وقت الاستراحة ☕"; 
-                document.getElementById('timer-icon').innerText = '☕';
-                document.getElementById('skip-break-btn').style.display = 'block'; 
-            } else {
-                document.getElementById('timer-title').innerText = "مذاكرة عميقة..."; 
-                document.getElementById('timer-icon').innerText = '⏳';
-                document.getElementById('skip-break-btn').style.display = 'none';
-            }
-            updateTimerDisplay();
-            clearInterval(timerInt); timerInt = setInterval(tickTimer, 1000);
-        } else {
-            clearTimerState();
-            if(!isBreakPhase) handleSessionComplete(studyMins);
-        }
-    } else {
-        navTo('main-screen', 'nav-home');
-    }
+            if(isBreakPhase) { document.getElementById('timer-title').innerText = "وقت الاستراحة ☕"; document.getElementById('timer-icon').innerText = '☕'; document.getElementById('skip-break-btn').style.display = 'block'; } 
+            else { document.getElementById('timer-title').innerText = "مذاكرة عميقة..."; document.getElementById('timer-icon').innerText = '⏳'; document.getElementById('skip-break-btn').style.display = 'none'; }
+            updateTimerDisplay(); clearInterval(timerInt); timerInt = setInterval(tickTimer, 1000);
+        } else { clearTimerState(); if(!isBreakPhase) handleSessionComplete(studyMins); }
+    } else { navTo('main-screen', 'nav-home'); }
 }
 
-window.openPomodoro = function() {
-    if(localStorage.getItem('timerEndTime') || localStorage.getItem('isPaused') === 'true') { navTo('pomodoro-screen'); } else { navTo('pomodoro-setup-screen'); }
-}
-
+window.openPomodoro = function() { if(localStorage.getItem('timerEndTime') || localStorage.getItem('isPaused') === 'true') { navTo('pomodoro-screen'); } else { navTo('pomodoro-setup-screen'); } }
 window.startFocusTimer = function() {
-    studyMins = parseInt(document.getElementById('study-mins').value) || 25; 
-    breakMins = parseInt(document.getElementById('break-mins').value) || 0;
-    totalSecs = studyMins * 60; isPaused = false; isBreakPhase = false;
-    timerEndTime = Date.now() + (totalSecs * 1000);
-    saveTimerState();
-    
-    document.getElementById('pause-btn').innerText = '⏸️ إيقاف'; 
-    document.getElementById('timer-title').innerText = "مذاكرة عميقة..."; 
-    document.getElementById('timer-icon').innerText = '⏳'; 
-    document.getElementById('skip-break-btn').style.display = 'none';
-    
-    updateTimerDisplay(); navTo('pomodoro-screen'); 
-    clearInterval(timerInt); timerInt = setInterval(tickTimer, 1000);
+    studyMins = parseInt(document.getElementById('study-mins').value) || 25; breakMins = parseInt(document.getElementById('break-mins').value) || 0;
+    totalSecs = studyMins * 60; isPaused = false; isBreakPhase = false; timerEndTime = Date.now() + (totalSecs * 1000); saveTimerState();
+    document.getElementById('pause-btn').innerText = '⏸️ إيقاف'; document.getElementById('timer-title').innerText = "مذاكرة عميقة..."; document.getElementById('timer-icon').innerText = '⏳'; document.getElementById('skip-break-btn').style.display = 'none';
+    updateTimerDisplay(); navTo('pomodoro-screen'); clearInterval(timerInt); timerInt = setInterval(tickTimer, 1000);
 }
-
 function tickTimer() {
-    if(isPaused) return;
-    let now = Date.now();
-    totalSecs = Math.round((timerEndTime - now) / 1000);
-    
+    if(isPaused) return; let now = Date.now(); totalSecs = Math.round((timerEndTime - now) / 1000);
     if(totalSecs <= 0) {
         if(!isBreakPhase && breakMins > 0) {
             isBreakPhase = true; totalSecs = breakMins * 60; timerEndTime = Date.now() + (totalSecs * 1000); saveTimerState();
-            document.getElementById('timer-title').innerText = "وقت الاستراحة ☕"; 
-            document.getElementById('timer-icon').innerText = '☕';
-            document.getElementById('skip-break-btn').style.display = 'block'; 
-        } else { 
-            clearInterval(timerInt); clearTimerState(); handleSessionComplete(studyMins); 
-        }
+            document.getElementById('timer-title').innerText = "وقت الاستراحة ☕"; document.getElementById('timer-icon').innerText = '☕'; document.getElementById('skip-break-btn').style.display = 'block'; 
+        } else { clearInterval(timerInt); clearTimerState(); handleSessionComplete(studyMins); }
     } else { updateTimerDisplay(); }
 }
-
 function updateTimerDisplay() { document.getElementById('timer-display').innerText = `${Math.floor(totalSecs/60).toString().padStart(2,'0')}:${(totalSecs%60).toString().padStart(2,'0')}`; }
-
-window.togglePause = function() { 
-    isPaused = !isPaused; 
-    document.getElementById('pause-btn').innerText = isPaused ? '▶️ إكمال' : '⏸️ إيقاف'; 
-    if(isPaused) { localStorage.removeItem('timerEndTime'); } else { timerEndTime = Date.now() + (totalSecs * 1000); }
-    saveTimerState();
-}
-
-window.stopFocusTimer = function(manual = false) { 
-    if(manual) { if(confirm('إنهاء الجلسة بدون حفظ الوقت؟')) { clearInterval(timerInt); clearTimerState(); navTo('main-screen', 'nav-home'); } }
-}
-
+window.togglePause = function() { isPaused = !isPaused; document.getElementById('pause-btn').innerText = isPaused ? '▶️ إكمال' : '⏸️ إيقاف'; if(isPaused) { localStorage.removeItem('timerEndTime'); } else { timerEndTime = Date.now() + (totalSecs * 1000); } saveTimerState(); }
+window.stopFocusTimer = function(manual = false) { if(manual) { if(confirm('إنهاء الجلسة بدون حفظ الوقت؟')) { clearInterval(timerInt); clearTimerState(); navTo('main-screen', 'nav-home'); } } }
 window.skipBreak = function() { clearInterval(timerInt); clearTimerState(); handleSessionComplete(studyMins); }
 
 async function handleSessionComplete(mins) {
-    const prevLevel = getLevelInfo(currentUserData.totalFocusMins / 60).current;
-    currentUserData.totalFocusMins += mins;
-    
+    const prevLevel = getLevelInfo(currentUserData.totalFocusMins / 60).current; currentUserData.totalFocusMins += mins;
     await window.setDoc(window.doc(window.db, "users", currentUserId), { totalFocusMins: currentUserData.totalFocusMins }, {merge:true});
     await incrementStreakAndCheck();
 
     const currLevel = getLevelInfo(currentUserData.totalFocusMins / 60).current;
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#3B82F6', '#60A5FA', '#ffffff'] });
-    
     updateMainUI(); navTo('main-screen', 'nav-home');
     if (currLevel.hours > prevLevel.hours) { showToast(`أسطورة! ترقيت للمستوى: ${currLevel.name} 🎉`); } else { showToast(`كفو! أنجزت ${mins} دقيقة للقمة 🚀`); }
 }
 
-// ================= لا للتسويف =================
-window.toggleAcc = function(view) {
-    document.getElementById('acc-list-view').style.display = 'none';
-    document.getElementById('acc-form-view').style.display = 'none';
-    document.getElementById('acc-plan-result').style.display = 'none';
-    if(view === 'result') { document.getElementById('acc-plan-result').style.display = 'block'; } else { document.getElementById(`acc-${view}-view`).style.display = 'block'; }
-}
-
+// لا للتسويف
+window.toggleAcc = function(view) { document.getElementById('acc-list-view').style.display = 'none'; document.getElementById('acc-form-view').style.display = 'none'; document.getElementById('acc-plan-result').style.display = 'none'; if(view === 'result') { document.getElementById('acc-plan-result').style.display = 'block'; } else { document.getElementById(`acc-${view}-view`).style.display = 'block'; } }
 window.openAccumulation = function() {
-    const listDiv = document.getElementById('saved-courses-list'); const globalProgressDiv = document.getElementById('acc-global-progress');
-    const plans = currentUserData.accPlans || [];
-    
-    let totalChaps = 0, doneChaps = 0;
-    plans.forEach(p => { totalChaps += p.chaptersData.length; doneChaps += p.chaptersData.filter(c => c.done).length; });
-    const globalPct = totalChaps ? Math.round((doneChaps/totalChaps)*100) : 0;
-
+    const listDiv = document.getElementById('saved-courses-list'); const globalProgressDiv = document.getElementById('acc-global-progress'); const plans = currentUserData.accPlans || [];
+    let totalChaps = 0, doneChaps = 0; plans.forEach(p => { totalChaps += p.chaptersData.length; doneChaps += p.chaptersData.filter(c => c.done).length; }); const globalPct = totalChaps ? Math.round((doneChaps/totalChaps)*100) : 0;
     if (plans.length > 0) { globalProgressDiv.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-weight:bold; color:var(--primary);">إنجاز المنهج الكلي</span><span style="font-weight:bold; color:var(--text-main);">${globalPct}%</span></div><div class="progress-container" style="margin-top:0; margin-bottom: 20px;"><div class="progress-bar" style="width:${globalPct}%;"></div></div>`; } else { globalProgressDiv.innerHTML = ''; }
-
-    if(plans.length === 0) { listDiv.innerHTML = '<p class="subtitle">لا توجد مواد مضافة.</p>'; } 
-    else {
+    if(plans.length === 0) { listDiv.innerHTML = '<p class="subtitle">لا توجد مواد مضافة.</p>'; } else {
         listDiv.innerHTML = plans.map((p, i) => {
             const total = p.chaptersData.length, done = p.chaptersData.filter(c => c.done).length, pct = total ? Math.round((done/total)*100) : 0;
             return `<div class="list-card" style="cursor: pointer;" onclick="showSavedPlan(${i})"><div style="display:flex; justify-content:space-between; align-items:center;"><h3 style="margin:0; color:var(--primary);">${p.course}</h3><span style="font-size:0.85rem; color:var(--text-muted);">${done}/${total} شباتر</span></div><div class="progress-container" style="height:8px; margin-top:12px;"><div class="progress-bar" style="width:${pct}%;"></div></div></div>`;
@@ -825,93 +620,53 @@ window.openAccumulation = function() {
     }
     toggleAcc('list'); navTo('acc-screen');
 }
-
 window.generatePlan = async function() {
-    const course = document.getElementById('acc-course').value.trim(); const chapters = parseInt(document.getElementById('acc-chapters').value) || 0;
-    const days = parseInt(document.getElementById('acc-days').value) || 0; const hoursPerChapter = parseFloat(document.getElementById('acc-hours').value) || 1.5;
+    const course = document.getElementById('acc-course').value.trim(); const chapters = parseInt(document.getElementById('acc-chapters').value) || 0; const days = parseInt(document.getElementById('acc-days').value) || 0; const hoursPerChapter = parseFloat(document.getElementById('acc-hours').value) || 1.5;
     if(!course || !chapters || !days) return showToast('أكمل جميع الحقول فضلاً.');
-
     const base = Math.floor(chapters / days), extra = chapters % days; const dailyPlan = [];
     for(let i = 0; i < days; i++) { const chCount = base + (i < extra ? 1 : 0); dailyPlan.push({ day: i + 1, chapters: chCount, hours: +(chCount * hoursPerChapter).toFixed(1) }); }
     const chaptersData = Array.from({length: chapters}, (_, i) => ({ id: i+1, done: false }));
-    
-    if(!currentUserData.accPlans) currentUserData.accPlans = [];
-    currentUserData.accPlans.push({ course, chapters, days, hoursPerChapter, dailyPlan, chaptersData });
+    if(!currentUserData.accPlans) currentUserData.accPlans = []; currentUserData.accPlans.push({ course, chapters, days, hoursPerChapter, dailyPlan, chaptersData });
     await window.setDoc(window.doc(window.db, "users", currentUserId), { accPlans: currentUserData.accPlans }, {merge:true});
     showToast(); showSavedPlan(currentUserData.accPlans.length - 1);
 }
-
 window.showSavedPlan = function(idx) {
-    const plan = currentUserData.accPlans[idx];
-    const total = plan.chaptersData.length, done = plan.chaptersData.filter(c => c.done).length, pct = total ? Math.round((done/total)*100) : 0;
-    
-    let html = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; width:100%;">
-            <button class="btn-secondary btn-small" onclick="openAccumulation()">رجوع للمواد</button>
-            <button class="btn-danger btn-small" onclick="deleteAccPlan(${idx})">حذف المادة</button>
-        </div>
-        <div style="margin-bottom:20px; text-align:center; width:100%;">
-            <div style="font-weight:800; font-size:2rem; color:var(--primary);">${pct}%</div>
-            <div class="progress-container"><div class="progress-bar" style="width:${pct}%;"></div></div>
-        </div>
-        <div class="list-card" style="width:100%;"><h3 style="color:var(--primary);">الخطة التفصيلية</h3>`;
-            
+    const plan = currentUserData.accPlans[idx]; const total = plan.chaptersData.length, done = plan.chaptersData.filter(c => c.done).length, pct = total ? Math.round((done/total)*100) : 0;
+    let html = `<div style="display:flex; justify-content:space-between; margin-bottom:15px; width:100%;"><button class="btn-secondary btn-small" onclick="openAccumulation()">رجوع للمواد</button><button class="btn-danger btn-small" onclick="deleteAccPlan(${idx})">حذف المادة</button></div><div style="margin-bottom:20px; text-align:center; width:100%;"><div style="font-weight:800; font-size:2rem; color:var(--primary);">${pct}%</div><div class="progress-container"><div class="progress-bar" style="width:${pct}%;"></div></div></div><div class="list-card" style="width:100%;"><h3 style="color:var(--primary);">الخطة التفصيلية</h3>`;
     plan.dailyPlan.forEach(d => {
         if(d.chapters > 0) html += `<div style="background: var(--input-bg); border-radius: 12px; padding: 12px; display:flex; justify-content:space-between; margin-bottom:10px;"><span>📅 اليوم ${d.day}</span><span style="color:var(--text-muted);">${d.chapters} شباتر (~${d.hours} س)</span></div>`;
         else html += `<div style="background: var(--input-bg); border-radius: 12px; padding: 12px; display:flex; justify-content:space-between; margin-bottom:10px; opacity:0.5;"><span>🔄 اليوم ${d.day}</span><span>مراجعة</span></div>`;
     });
-    
     html += `</div><h3 style="color:var(--primary); width:100%;">شباتر المادة</h3><div style="display:flex; flex-direction:column; gap:8px; width:100%;">`;
     plan.chaptersData.forEach((ch, chIdx) => {
-        html += `<label style="display: flex; align-items: center; gap: 10px; padding: 14px; background: var(--input-bg); border: 1px solid ${ch.done?'var(--primary)':'transparent'}; border-radius: 12px; cursor: pointer; opacity: ${ch.done?'0.5':'1'}; text-decoration: ${ch.done?'line-through':'none'}; transition:0.3s;">
-            <input type="checkbox" style="width: 22px; height: 22px; accent-color: var(--primary);" onchange="toggleChapterAcc(${idx}, ${chIdx})" ${ch.done ? 'checked' : ''}>شابتر ${ch.id}
-        </label>`;
+        html += `<label style="display: flex; align-items: center; gap: 10px; padding: 14px; background: var(--input-bg); border: 1px solid ${ch.done?'var(--primary)':'transparent'}; border-radius: 12px; cursor: pointer; opacity: ${ch.done?'0.5':'1'}; text-decoration: ${ch.done?'line-through':'none'}; transition:0.3s;"><input type="checkbox" style="width: 22px; height: 22px; accent-color: var(--primary);" onchange="toggleChapterAcc(${idx}, ${chIdx})" ${ch.done ? 'checked' : ''}>شابتر ${ch.id}</label>`;
     });
     document.getElementById('acc-plan-result').innerHTML = html; toggleAcc('result');
 }
-
-window.deleteAccPlan = async function(idx) {
-    if(!confirm(`متأكد من حذف المادة؟`)) return;
-    currentUserData.accPlans.splice(idx, 1);
-    await window.setDoc(window.doc(window.db, "users", currentUserId), { accPlans: currentUserData.accPlans }, {merge:true});
-    showToast('تم الحذف ✅'); openAccumulation();
-}
-
+window.deleteAccPlan = async function(idx) { if(!confirm(`متأكد من حذف المادة؟`)) return; currentUserData.accPlans.splice(idx, 1); await window.setDoc(window.doc(window.db, "users", currentUserId), { accPlans: currentUserData.accPlans }, {merge:true}); showToast('تم الحذف ✅'); openAccumulation(); }
 window.toggleChapterAcc = async function(planIdx, chapIdx) {
-    const isNowDone = !currentUserData.accPlans[planIdx].chaptersData[chapIdx].done;
-    currentUserData.accPlans[planIdx].chaptersData[chapIdx].done = isNowDone;
+    const isNowDone = !currentUserData.accPlans[planIdx].chaptersData[chapIdx].done; currentUserData.accPlans[planIdx].chaptersData[chapIdx].done = isNowDone;
     await window.setDoc(window.doc(window.db, "users", currentUserId), { accPlans: currentUserData.accPlans }, {merge:true});
-    if(isNowDone) { await incrementStreakAndCheck(); }
-    showSavedPlan(planIdx);
+    if(isNowDone) { await incrementStreakAndCheck(); } showSavedPlan(planIdx);
 }
 
-// ================= الجدول الدراسي (نظام التبويبات) =================
+// الجدول الدراسي
 window.toggleScheduleMode = function(mode) {
-    document.getElementById('sch-view-btn').classList.toggle('active', mode === 'view'); document.getElementById('sch-edit-btn').classList.toggle('active', mode === 'edit');
-    document.getElementById('sch-view-mode').style.display = mode === 'view' ? 'block' : 'none'; document.getElementById('sch-edit-mode').style.display = mode === 'edit' ? 'block' : 'none';
+    document.getElementById('sch-view-btn').classList.toggle('active', mode === 'view'); document.getElementById('sch-edit-btn').classList.toggle('active', mode === 'edit'); document.getElementById('sch-view-mode').style.display = mode === 'view' ? 'block' : 'none'; document.getElementById('sch-edit-mode').style.display = mode === 'edit' ? 'block' : 'none';
     if(mode === 'view') renderScheduleView();
     if(mode === 'edit') { currentScheduleEdit = JSON.parse(JSON.stringify(currentUserData.schedule)); loadDayEditForm(); }
 }
-
 window.renderScheduleView = function() {
-    let tabsHtml = `<div class="schedule-tabs">`;
-    WEEK_DAYS.forEach(day => { tabsHtml += `<button class="tab-btn ${day === currentScheduleDay ? 'active' : ''}" onclick="switchScheduleTab('${day}')">${day}</button>`; });
-    tabsHtml += `</div><div id="schedule-content"></div>`; document.getElementById('sch-view-mode').innerHTML = tabsHtml; switchScheduleTab(currentScheduleDay);
+    let tabsHtml = `<div class="schedule-tabs">`; WEEK_DAYS.forEach(day => { tabsHtml += `<button class="tab-btn ${day === currentScheduleDay ? 'active' : ''}" onclick="switchScheduleTab('${day}')">${day}</button>`; }); tabsHtml += `</div><div id="schedule-content"></div>`; document.getElementById('sch-view-mode').innerHTML = tabsHtml; switchScheduleTab(currentScheduleDay);
 }
-
 window.switchScheduleTab = function(day) {
-    currentScheduleDay = day;
-    document.querySelectorAll('.schedule-tabs .tab-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText === day); });
+    currentScheduleDay = day; document.querySelectorAll('.schedule-tabs .tab-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText === day); });
     const dData = currentUserData.schedule[day] || {off: true, courses: []};
     let html = `<div class="day-card slide-in" style="text-align:right;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:10px;"><h3 style="margin:0; color:var(--primary);">${day}</h3>`;
     if(dData.off || dData.courses.length === 0) { html += `<span style="font-size:0.9rem; opacity:0.6;">أوف 💤</span></div><p class="subtitle" style="text-align:right; margin-top: 15px;">لا توجد محاضرات في هذا اليوم، استمتع بوقتك!</p></div>`; } 
-    else {
-        html += `<span style="font-size:0.9rem;">${dData.courses.length} محاضرات</span></div>`;
-        dData.courses.forEach(c => { html += `<div class="course-badge"><span>${c.name}</span><span dir="ltr">${c.time}</span></div>`; }); html += `</div>`;
-    }
+    else { html += `<span style="font-size:0.9rem;">${dData.courses.length} محاضرات</span></div>`; dData.courses.forEach(c => { html += `<div class="course-badge"><span>${c.name}</span><span dir="ltr">${c.time}</span></div>`; }); html += `</div>`; }
     document.getElementById('schedule-content').innerHTML = html;
 }
-
 window.loadDayEditForm = function() { const day = document.getElementById('sch-day-select').value; document.getElementById('sch-is-off').checked = currentScheduleEdit[day].off; renderCoursesEditList(day); }
 window.toggleDayOff = function() { const day = document.getElementById('sch-day-select').value; currentScheduleEdit[day].off = document.getElementById('sch-is-off').checked; renderCoursesEditList(day); }
 window.addScheduleCourseField = function() { const day = document.getElementById('sch-day-select').value; currentScheduleEdit[day].courses.push({ name: '', time: '' }); currentScheduleEdit[day].off = false; document.getElementById('sch-is-off').checked = false; renderCoursesEditList(day); }
@@ -925,13 +680,12 @@ window.updateCourseEdit = function(day, idx, field, val) { currentScheduleEdit[d
 window.removeCourseEdit = function(day, idx) { currentScheduleEdit[day].courses.splice(idx, 1); renderCoursesEditList(day); }
 window.saveSchedule = async function() { currentUserData.schedule = currentScheduleEdit; await window.setDoc(window.doc(window.db, "users", currentUserId), { schedule: currentUserData.schedule }, {merge:true}); showToast(); toggleScheduleMode('view'); }
 
-// ================= حاسبة المعدل =================
+// حاسبة المعدل
 const gradesDict = {'A+':5, 'A':4.75, 'B+':4.5, 'B':4, 'C+':3.5, 'C':3, 'D+':2.5, 'D':2, 'F':1}; let cCount = 0; let gpaMode = 'semester';
 window.setGpaMode = function(mode) { gpaMode = mode; document.getElementById('gpa-mode-sem').classList.toggle('active', mode === 'semester'); document.getElementById('gpa-mode-cum').classList.toggle('active', mode === 'cumulative'); document.getElementById('cum-prev-fields').style.display = mode === 'cumulative' ? 'block' : 'none'; document.getElementById('gpa-calc-btn').innerText = mode === 'cumulative' ? 'احسب التراكمي' : 'احسب الفصلي'; }
 window.addCourseRow = function() { cCount++; const div = document.createElement('div'); div.className = 'form-group'; div.style = "display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px;"; div.id = `cr-${cCount}`; div.innerHTML = `<input type="text" placeholder="المادة"><input type="number" class="c-hrs" placeholder="ساعات"><select class="c-grd">${Object.keys(gradesDict).map(k=>`<option value="${k}">${k}</option>`).join('')}</select><button class="btn-danger" style="padding:10px; margin:0; border-radius:12px;" onclick="document.getElementById('cr-${cCount}').remove()">×</button>`; document.getElementById('courses-container').appendChild(div); }
 window.calcGPA = function() {
-    let pts = 0, hrs = 0;
-    document.querySelectorAll('.c-hrs').forEach(el => { const h = parseFloat(el.value) || 0; pts += h * gradesDict[el.nextSibling.value]; hrs += h; });
+    let pts = 0, hrs = 0; document.querySelectorAll('.c-hrs').forEach(el => { const h = parseFloat(el.value) || 0; pts += h * gradesDict[el.nextSibling.value]; hrs += h; });
     if(!hrs) return showToast('أضف مواد وأدخل الساعات.');
     let resultVal;
     if(gpaMode === 'cumulative') {
@@ -941,7 +695,7 @@ window.calcGPA = function() {
     document.getElementById('sem-gpa-val').innerText = resultVal.toFixed(2); document.getElementById('semester-result').style.display = 'block';
 }
 
-// ================= لوحة الشرف =================
+// لوحة الشرف
 window.loadLeaderboard = async function() {
     const listDiv = document.getElementById('leaderboard-list'); listDiv.innerHTML = '<p class="pulse-anim subtitle">جاري جلب الأساطير...</p>';
     try {
@@ -962,17 +716,19 @@ window.loadLeaderboard = async function() {
     } catch(e) { listDiv.innerHTML = '<p style="color:var(--danger); text-align:center;">تعذر جلب البيانات.</p>'; }
 }
 
-// ================= الملف الشخصي المقسم =================
+// الملف الشخصي
 window.navToProfile = function() {
     document.getElementById('prof-handle').value = currentUserData.handle || ("@" + telegramUsername);
     document.getElementById('prof-name').value = currentUserData.name || '';
-    document.getElementById('prof-major').value = currentUserData.major || '';
     document.getElementById('prof-gender').value = currentUserData.gender || '';
     document.getElementById('prof-phone').value = currentUserData.phone || '';
     document.getElementById('prof-email').value = currentUserData.email || '';
     
+    initCascadingDropdowns('prof-uni', 'prof-college', 'prof-major', currentUserData.university, currentUserData.college, currentUserData.major);
+
     window.profileSnapshot = JSON.stringify({
-        name: document.getElementById('prof-name').value.trim(), major: document.getElementById('prof-major').value.trim(),
+        name: document.getElementById('prof-name').value.trim(), university: document.getElementById('prof-uni').value,
+        college: document.getElementById('prof-college').value, major: document.getElementById('prof-major').value,
         gender: document.getElementById('prof-gender').value, phone: document.getElementById('prof-phone').value.trim(), email: document.getElementById('prof-email').value.trim()
     });
 
@@ -982,18 +738,22 @@ window.navToProfile = function() {
 
 window.saveProfile = async function() {
     const currentData = {
-        name: document.getElementById('prof-name').value.trim(), major: document.getElementById('prof-major').value.trim(),
+        name: document.getElementById('prof-name').value.trim(), university: document.getElementById('prof-uni').value,
+        college: document.getElementById('prof-college').value, major: document.getElementById('prof-major').value,
         gender: document.getElementById('prof-gender').value, phone: document.getElementById('prof-phone').value.trim(), email: document.getElementById('prof-email').value.trim()
     };
 
     if(JSON.stringify(currentData) === window.profileSnapshot) { showToast('لا يوجد تعديلات جديدة لحفظها ℹ️'); return; }
 
     if(currentData.name) currentUserData.name = currentData.name;
+    if(currentData.university) currentUserData.university = currentData.university;
+    if(currentData.college) currentUserData.college = currentData.college;
     if(currentData.major) currentUserData.major = currentData.major;
     currentUserData.gender = currentData.gender; currentUserData.phone = currentData.phone; currentUserData.email = currentData.email;
 
     await window.setDoc(window.doc(window.db, "users", currentUserId), { 
-        name: currentUserData.name, major: currentUserData.major, gender: currentUserData.gender, phone: currentUserData.phone, email: currentUserData.email 
+        name: currentUserData.name, university: currentUserData.university, college: currentUserData.college, major: currentUserData.major, 
+        gender: currentUserData.gender, phone: currentUserData.phone, email: currentUserData.email 
     }, {merge:true});
     
     window.profileSnapshot = JSON.stringify(currentData); updateMainUI(); showToast();
