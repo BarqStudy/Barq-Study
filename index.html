@@ -85,7 +85,6 @@ body { background-color: var(--bg-color); color: var(--text-main); overflow-x: h
 .light-2 { bottom: -10%; left: -10%; width: 400px; height: 400px; background: rgba(255, 215, 0, 0.15); }
 @keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-30px, 30px) scale(1.2); } }
 
-/* الشعار المتوهج المفرغ من الخلفية */
 .app-logo {
     width: 80px; height: 80px; margin: 0 auto 10px; display: block;
     filter: drop-shadow(0 0 15px var(--primary-glow)); transition: all 0.3s;
@@ -154,6 +153,7 @@ button:hover { filter: brightness(1.1); }
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 440px; border-radius: 24px;
     background: var(--nav-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     border: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 12px 5px; z-index: 100; box-shadow: var(--glass-shadow); transition: background 0.4s;
+    display: none; /* مخفي افتراضياً حتى يسجل الطالب */
 }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; transition: all 0.3s; font-size: 0.75rem; font-weight: 700; width: 20%; }
 .nav-item .icon-3d { font-size: 1.6rem; }
@@ -170,7 +170,7 @@ button:hover { filter: brightness(1.1); }
 .progress-container { width: 100%; background: var(--input-bg); border-radius: 20px; height: 14px; margin-top: 15px; overflow: hidden; border: 1px solid var(--item-border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
 .progress-bar { height: 100%; background: linear-gradient(90deg, #3B82F6, #60A5FA); width: 0%; transition: width 0.8s; border-radius: 20px; }
 
-/* الجدول الدراسي والشباتر (نظام التبويبات الجديد) */
+/* الجدول الدراسي والشباتر */
 .schedule-tabs { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 15px; padding-bottom: 8px; width: 100%; }
 .schedule-tabs::-webkit-scrollbar { height: 4px; }
 .schedule-tabs::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
@@ -208,7 +208,6 @@ button:hover { filter: brightness(1.1); }
 
 <!-- 1. شاشة التحميل -->
 <div id="loading-screen" class="page-screen active slide-in" style="justify-content: center;">
-    <!-- الشعار النقي بصيغة SVG مفرغ ومتوهج يطابق الصورة المطلوبة -->
     <svg class="app-logo pulse-anim" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 3L1 9L4 10.63V17L12 21L20 17V10.63L21 10.09V17H23V9L12 3ZM12 17.5L5.5 14V11.45L12 15L18.5 11.45V14L12 17.5Z" fill="var(--primary)"/>
         <path d="M4 13.5V18C4 18 8 20 12 20C16 20 20 18 20 18V13.5C20 13.5 16 15.5 12 15.5C8 15.5 4 13.5 4 13.5Z" fill="var(--primary)" opacity="0.8"/>
@@ -263,12 +262,8 @@ button:hover { filter: brightness(1.1); }
 <!-- 3. الرئيسية -->
 <div id="main-screen" class="page-screen slide-in" style="padding-top: 50px;">
     
-    <!-- زر تبديل الثيم -->
-    <button class="btn-floating btn-theme" onclick="toggleTheme()">
-        <span class="icon-3d" id="theme-icon">☀️</span>
-    </button>
+    <button class="btn-floating btn-theme" onclick="toggleTheme()"><span class="icon-3d" id="theme-icon">☀️</span></button>
 
-    <!-- رأس الصفحة: اسم الطالب وتخصصه -->
     <div id="user-header" style="text-align: center; margin-bottom: 25px; width: 100%;">
         <svg class="app-logo" style="width: 60px; height: 60px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 3L1 9L4 10.63V17L12 21L20 17V10.63L21 10.09V17H23V9L12 3ZM12 17.5L5.5 14V11.45L12 15L18.5 11.45V14L12 17.5Z" fill="var(--primary)"/>
@@ -312,20 +307,16 @@ button:hover { filter: brightness(1.1); }
 
     <div class="menu-grid">
         <button class="btn-secondary menu-btn" onclick="openPomodoro()">
-            <div class="icon-3d" style="font-size: 2.2rem;">⏳</div>
-            <span style="font-weight:700;">جلسة تركيز</span>
+            <div class="icon-3d" style="font-size: 2.2rem;">⏳</div><span style="font-weight:700;">جلسة تركيز</span>
         </button>
         <button class="btn-secondary menu-btn" onclick="openAccumulation()">
-            <div class="icon-3d" style="font-size: 2.2rem;">📑</div>
-            <span style="font-weight:700;">لا للتسويف</span>
+            <div class="icon-3d" style="font-size: 2.2rem;">📑</div><span style="font-weight:700;">لا للتسويف</span>
         </button>
         <button class="btn-secondary menu-btn" onclick="navTo('schedule-screen', 'nav-schedule'); toggleScheduleMode('view');">
-            <div class="icon-3d" style="font-size: 2.2rem;">📅</div>
-            <span style="font-weight:700;">الجدول الدراسي</span>
+            <div class="icon-3d" style="font-size: 2.2rem;">📅</div><span style="font-weight:700;">الجدول الدراسي</span>
         </button>
         <button class="btn-secondary menu-btn" onclick="navTo('gpa-screen')">
-            <div class="icon-3d" style="font-size: 2.2rem;">📊</div>
-            <span style="font-weight:700;">حاسبة المعدل</span>
+            <div class="icon-3d" style="font-size: 2.2rem;">📊</div><span style="font-weight:700;">حاسبة المعدل</span>
         </button>
     </div>
 </div>
@@ -356,7 +347,7 @@ button:hover { filter: brightness(1.1); }
     </div>
 </div>
 
-<!-- 5. الجدول الدراسي (نظام التبويبات) -->
+<!-- 5. الجدول الدراسي -->
 <div id="schedule-screen" class="page-screen slide-in">
     <button class="btn-floating btn-back" onclick="navTo('main-screen', 'nav-home')">➔</button>
     <div class="glass-card" style="margin-top:15px; text-align:center;">
@@ -368,7 +359,6 @@ button:hover { filter: brightness(1.1); }
             <button type="button" class="toggle-btn" id="sch-edit-btn" onclick="toggleScheduleMode('edit')">تعديل</button>
         </div>
         
-        <!-- وضع العرض بتبويبات -->
         <div id="sch-view-mode" style="text-align:right; width: 100%;"></div>
         
         <div id="sch-edit-mode" style="display:none; text-align:right;">
@@ -493,7 +483,7 @@ button:hover { filter: brightness(1.1); }
 </div>
 
 <!-- البار السفلي الدائم -->
-<div class="bottom-nav">
+<div class="bottom-nav" id="main-bottom-nav">
     <div class="nav-item active" id="nav-home" onclick="navTo('main-screen', 'nav-home')"><div class="icon-3d">🏠</div><span>الرئيسية</span></div>
     <div class="nav-item" id="nav-schedule" onclick="navTo('schedule-screen', 'nav-schedule'); toggleScheduleMode('view');"><div class="icon-3d">📅</div><span>الجدول</span></div>
     <div class="nav-item" id="nav-leaderboard" onclick="navTo('leaderboard-screen', 'nav-leaderboard'); loadLeaderboard();"><div class="icon-3d">🏆</div><span>الشرف</span></div>
@@ -516,7 +506,7 @@ const FOCUS_LEVELS = [
 
 const WEEK_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
 let currentScheduleEdit = {};
-let currentScheduleDay = 'الأحد'; // لتبويبات الجدول
+let currentScheduleDay = 'الأحد'; 
 
 // متغيرات حفظ الجلسة
 let timerInt = null, totalSecs = 0, isPaused = false, studyMins = 0, breakMins = 0, isBreakPhase = false;
@@ -543,14 +533,12 @@ if(localStorage.getItem('theme') === 'light') {
     window.addEventListener('DOMContentLoaded', () => { document.getElementById('theme-icon').innerText = '🌙'; });
 }
 
-// التحكم بالخط
 document.getElementById('font-size-slider').addEventListener('input', function() {
     document.documentElement.style.setProperty('--base-font-size', this.value + 'px');
     localStorage.setItem('customFontSize', this.value);
 });
 const savedFontSize = localStorage.getItem('customFontSize');
 if(savedFontSize) { document.documentElement.style.setProperty('--base-font-size', savedFontSize + 'px'); }
-
 
 // ================= نظام النافذة المنبثقة (Toast) =================
 window.showToast = function(msg) {
@@ -585,16 +573,21 @@ window.addEventListener('firebaseReady', async () => {
     await checkUserData();
 });
 
-// ================= جلب البيانات =================
+// ================= جلب البيانات والتحقق من التسجيل =================
 async function checkUserData() {
     try {
         const docSnap = await window.getDoc(window.doc(window.db, "users", currentUserId));
         if (docSnap.exists()) {
             currentUserData = docSnap.data();
             
+            // إخفاء كل شيء إذا لم يكتمل التسجيل
             if(!currentUserData.name || !currentUserData.college || !currentUserData.major) {
+                document.getElementById('main-bottom-nav').style.display = 'none';
                 navTo('setup-screen'); return;
             }
+
+            // إظهار الشريط السفلي لأن الطالب مسجل
+            document.getElementById('main-bottom-nav').style.display = 'flex';
 
             if(!currentUserData.totalFocusMins) currentUserData.totalFocusMins = 0;
             if(!currentUserData.accPlans) currentUserData.accPlans = [];
@@ -606,7 +599,10 @@ async function checkUserData() {
             
             updateMainUI();
             checkPersistedTimer();
-        } else { navTo('setup-screen'); }
+        } else { 
+            document.getElementById('main-bottom-nav').style.display = 'none';
+            navTo('setup-screen'); 
+        }
     } catch(e) { console.error(e); }
 }
 
@@ -621,6 +617,9 @@ document.getElementById('save-btn').addEventListener('click', async () => {
         accPlans: [], schedule: { 'الأحد':{off:true, courses:[]}, 'الإثنين':{off:true, courses:[]}, 'الثلاثاء':{off:true, courses:[]}, 'الأربعاء':{off:true, courses:[]}, 'الخميس':{off:true, courses:[]} } 
     };
     await window.setDoc(window.doc(window.db, "users", currentUserId), currentUserData);
+    
+    // إظهار الشريط السفلي وتوجيه الطالب
+    document.getElementById('main-bottom-nav').style.display = 'flex';
     showToast('مرحباً بك في برق المتعلم ⚡');
     updateMainUI();
     navTo('main-screen', 'nav-home');
@@ -677,7 +676,7 @@ function updateMainUI() {
     }
 }
 
-// ================= حفظ الجلسة (Session Persistence) =================
+// ================= حفظ الجلسة =================
 function saveTimerState() {
     localStorage.setItem('timerEndTime', timerEndTime);
     localStorage.setItem('studyMins', studyMins);
@@ -783,9 +782,7 @@ window.stopFocusTimer = function(manual = false) {
     if(manual) { if(confirm('إنهاء الجلسة بدون حفظ الوقت؟')) { clearInterval(timerInt); clearTimerState(); navTo('main-screen', 'nav-home'); } }
 }
 
-window.skipBreak = function() { 
-    clearInterval(timerInt); clearTimerState(); handleSessionComplete(studyMins); 
-}
+window.skipBreak = function() { clearInterval(timerInt); clearTimerState(); handleSessionComplete(studyMins); }
 
 async function handleSessionComplete(mins) {
     const prevLevel = getLevelInfo(currentUserData.totalFocusMins / 60).current;
@@ -797,15 +794,11 @@ async function handleSessionComplete(mins) {
     const currLevel = getLevelInfo(currentUserData.totalFocusMins / 60).current;
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#3B82F6', '#60A5FA', '#ffffff'] });
     
-    updateMainUI();
-    navTo('main-screen', 'nav-home');
-    
-    if (currLevel.hours > prevLevel.hours) { showToast(`أسطورة! ترقيت للمستوى: ${currLevel.name} 🎉`); } 
-    else { showToast(`كفو! أنجزت ${mins} دقيقة للقمة 🚀`); }
+    updateMainUI(); navTo('main-screen', 'nav-home');
+    if (currLevel.hours > prevLevel.hours) { showToast(`أسطورة! ترقيت للمستوى: ${currLevel.name} 🎉`); } else { showToast(`كفو! أنجزت ${mins} دقيقة للقمة 🚀`); }
 }
 
-
-// ================= 1. لا للتسويف =================
+// ================= لا للتسويف =================
 window.toggleAcc = function(view) {
     document.getElementById('acc-list-view').style.display = 'none';
     document.getElementById('acc-form-view').style.display = 'none';
@@ -821,9 +814,7 @@ window.openAccumulation = function() {
     plans.forEach(p => { totalChaps += p.chaptersData.length; doneChaps += p.chaptersData.filter(c => c.done).length; });
     const globalPct = totalChaps ? Math.round((doneChaps/totalChaps)*100) : 0;
 
-    if (plans.length > 0) {
-        globalProgressDiv.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-weight:bold; color:var(--primary);">إنجاز المنهج الكلي</span><span style="font-weight:bold; color:var(--text-main);">${globalPct}%</span></div><div class="progress-container" style="margin-top:0; margin-bottom: 20px;"><div class="progress-bar" style="width:${globalPct}%;"></div></div>`;
-    } else { globalProgressDiv.innerHTML = ''; }
+    if (plans.length > 0) { globalProgressDiv.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-weight:bold; color:var(--primary);">إنجاز المنهج الكلي</span><span style="font-weight:bold; color:var(--text-main);">${globalPct}%</span></div><div class="progress-container" style="margin-top:0; margin-bottom: 20px;"><div class="progress-bar" style="width:${globalPct}%;"></div></div>`; } else { globalProgressDiv.innerHTML = ''; }
 
     if(plans.length === 0) { listDiv.innerHTML = '<p class="subtitle">لا توجد مواد مضافة.</p>'; } 
     else {
@@ -890,17 +881,14 @@ window.toggleChapterAcc = async function(planIdx, chapIdx) {
     const isNowDone = !currentUserData.accPlans[planIdx].chaptersData[chapIdx].done;
     currentUserData.accPlans[planIdx].chaptersData[chapIdx].done = isNowDone;
     await window.setDoc(window.doc(window.db, "users", currentUserId), { accPlans: currentUserData.accPlans }, {merge:true});
-    
     if(isNowDone) { await incrementStreakAndCheck(); }
     showSavedPlan(planIdx);
 }
 
-// ================= 2. الجدول الدراسي (نظام التبويبات) =================
+// ================= الجدول الدراسي (نظام التبويبات) =================
 window.toggleScheduleMode = function(mode) {
-    document.getElementById('sch-view-btn').classList.toggle('active', mode === 'view');
-    document.getElementById('sch-edit-btn').classList.toggle('active', mode === 'edit');
-    document.getElementById('sch-view-mode').style.display = mode === 'view' ? 'block' : 'none';
-    document.getElementById('sch-edit-mode').style.display = mode === 'edit' ? 'block' : 'none';
+    document.getElementById('sch-view-btn').classList.toggle('active', mode === 'view'); document.getElementById('sch-edit-btn').classList.toggle('active', mode === 'edit');
+    document.getElementById('sch-view-mode').style.display = mode === 'view' ? 'block' : 'none'; document.getElementById('sch-edit-mode').style.display = mode === 'edit' ? 'block' : 'none';
     if(mode === 'view') renderScheduleView();
     if(mode === 'edit') { currentScheduleEdit = JSON.parse(JSON.stringify(currentUserData.schedule)); loadDayEditForm(); }
 }
@@ -908,9 +896,7 @@ window.toggleScheduleMode = function(mode) {
 window.renderScheduleView = function() {
     let tabsHtml = `<div class="schedule-tabs">`;
     WEEK_DAYS.forEach(day => { tabsHtml += `<button class="tab-btn ${day === currentScheduleDay ? 'active' : ''}" onclick="switchScheduleTab('${day}')">${day}</button>`; });
-    tabsHtml += `</div><div id="schedule-content"></div>`;
-    document.getElementById('sch-view-mode').innerHTML = tabsHtml;
-    switchScheduleTab(currentScheduleDay);
+    tabsHtml += `</div><div id="schedule-content"></div>`; document.getElementById('sch-view-mode').innerHTML = tabsHtml; switchScheduleTab(currentScheduleDay);
 }
 
 window.switchScheduleTab = function(day) {
@@ -918,13 +904,10 @@ window.switchScheduleTab = function(day) {
     document.querySelectorAll('.schedule-tabs .tab-btn').forEach(btn => { btn.classList.toggle('active', btn.innerText === day); });
     const dData = currentUserData.schedule[day] || {off: true, courses: []};
     let html = `<div class="day-card slide-in" style="text-align:right;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:10px;"><h3 style="margin:0; color:var(--primary);">${day}</h3>`;
-    
-    if(dData.off || dData.courses.length === 0) {
-        html += `<span style="font-size:0.9rem; opacity:0.6;">أوف 💤</span></div><p class="subtitle" style="text-align:right; margin-top: 15px;">لا توجد محاضرات في هذا اليوم، استمتع بوقتك!</p></div>`;
-    } else {
+    if(dData.off || dData.courses.length === 0) { html += `<span style="font-size:0.9rem; opacity:0.6;">أوف 💤</span></div><p class="subtitle" style="text-align:right; margin-top: 15px;">لا توجد محاضرات في هذا اليوم، استمتع بوقتك!</p></div>`; } 
+    else {
         html += `<span style="font-size:0.9rem;">${dData.courses.length} محاضرات</span></div>`;
-        dData.courses.forEach(c => { html += `<div class="course-badge"><span>${c.name}</span><span dir="ltr">${c.time}</span></div>`; });
-        html += `</div>`;
+        dData.courses.forEach(c => { html += `<div class="course-badge"><span>${c.name}</span><span dir="ltr">${c.time}</span></div>`; }); html += `</div>`;
     }
     document.getElementById('schedule-content').innerHTML = html;
 }
@@ -942,7 +925,7 @@ window.updateCourseEdit = function(day, idx, field, val) { currentScheduleEdit[d
 window.removeCourseEdit = function(day, idx) { currentScheduleEdit[day].courses.splice(idx, 1); renderCoursesEditList(day); }
 window.saveSchedule = async function() { currentUserData.schedule = currentScheduleEdit; await window.setDoc(window.doc(window.db, "users", currentUserId), { schedule: currentUserData.schedule }, {merge:true}); showToast(); toggleScheduleMode('view'); }
 
-// ================= 3. حاسبة المعدل =================
+// ================= حاسبة المعدل =================
 const gradesDict = {'A+':5, 'A':4.75, 'B+':4.5, 'B':4, 'C+':3.5, 'C':3, 'D+':2.5, 'D':2, 'F':1}; let cCount = 0; let gpaMode = 'semester';
 window.setGpaMode = function(mode) { gpaMode = mode; document.getElementById('gpa-mode-sem').classList.toggle('active', mode === 'semester'); document.getElementById('gpa-mode-cum').classList.toggle('active', mode === 'cumulative'); document.getElementById('cum-prev-fields').style.display = mode === 'cumulative' ? 'block' : 'none'; document.getElementById('gpa-calc-btn').innerText = mode === 'cumulative' ? 'احسب التراكمي' : 'احسب الفصلي'; }
 window.addCourseRow = function() { cCount++; const div = document.createElement('div'); div.className = 'form-group'; div.style = "display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:8px;"; div.id = `cr-${cCount}`; div.innerHTML = `<input type="text" placeholder="المادة"><input type="number" class="c-hrs" placeholder="ساعات"><select class="c-grd">${Object.keys(gradesDict).map(k=>`<option value="${k}">${k}</option>`).join('')}</select><button class="btn-danger" style="padding:10px; margin:0; border-radius:12px;" onclick="document.getElementById('cr-${cCount}').remove()">×</button>`; document.getElementById('courses-container').appendChild(div); }
@@ -958,10 +941,9 @@ window.calcGPA = function() {
     document.getElementById('sem-gpa-val').innerText = resultVal.toFixed(2); document.getElementById('semester-result').style.display = 'block';
 }
 
-// ================= 4. لوحة الشرف (مفعلة من جديد) =================
+// ================= لوحة الشرف =================
 window.loadLeaderboard = async function() {
-    const listDiv = document.getElementById('leaderboard-list'); 
-    listDiv.innerHTML = '<p class="pulse-anim subtitle">جاري جلب الأساطير...</p>';
+    const listDiv = document.getElementById('leaderboard-list'); listDiv.innerHTML = '<p class="pulse-anim subtitle">جاري جلب الأساطير...</p>';
     try {
         const snap = await window.getDocs(window.query(window.collection(window.db, "users"), window.orderBy("currentStreak", "desc"), window.limit(10)));
         let html = ''; let r = 1;
@@ -980,7 +962,7 @@ window.loadLeaderboard = async function() {
     } catch(e) { listDiv.innerHTML = '<p style="color:var(--danger); text-align:center;">تعذر جلب البيانات.</p>'; }
 }
 
-// ================= 5. الملف الشخصي المقسم =================
+// ================= الملف الشخصي المقسم =================
 window.navToProfile = function() {
     document.getElementById('prof-handle').value = currentUserData.handle || ("@" + telegramUsername);
     document.getElementById('prof-name').value = currentUserData.name || '';
@@ -989,55 +971,35 @@ window.navToProfile = function() {
     document.getElementById('prof-phone').value = currentUserData.phone || '';
     document.getElementById('prof-email').value = currentUserData.email || '';
     
-    // حفظ لقطة للمقارنة
     window.profileSnapshot = JSON.stringify({
-        name: document.getElementById('prof-name').value.trim(),
-        major: document.getElementById('prof-major').value.trim(),
-        gender: document.getElementById('prof-gender').value,
-        phone: document.getElementById('prof-phone').value.trim(),
-        email: document.getElementById('prof-email').value.trim()
+        name: document.getElementById('prof-name').value.trim(), major: document.getElementById('prof-major').value.trim(),
+        gender: document.getElementById('prof-gender').value, phone: document.getElementById('prof-phone').value.trim(), email: document.getElementById('prof-email').value.trim()
     });
 
     document.getElementById('font-size-slider').value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--base-font-size')) || 15;
-
     navTo('profile-screen', 'nav-profile');
 }
 
 window.saveProfile = async function() {
     const currentData = {
-        name: document.getElementById('prof-name').value.trim(),
-        major: document.getElementById('prof-major').value.trim(),
-        gender: document.getElementById('prof-gender').value,
-        phone: document.getElementById('prof-phone').value.trim(),
-        email: document.getElementById('prof-email').value.trim()
+        name: document.getElementById('prof-name').value.trim(), major: document.getElementById('prof-major').value.trim(),
+        gender: document.getElementById('prof-gender').value, phone: document.getElementById('prof-phone').value.trim(), email: document.getElementById('prof-email').value.trim()
     };
 
-    if(JSON.stringify(currentData) === window.profileSnapshot) {
-        showToast('لا يوجد تعديلات جديدة لحفظها ℹ️');
-        return;
-    }
+    if(JSON.stringify(currentData) === window.profileSnapshot) { showToast('لا يوجد تعديلات جديدة لحفظها ℹ️'); return; }
 
     if(currentData.name) currentUserData.name = currentData.name;
     if(currentData.major) currentUserData.major = currentData.major;
-    currentUserData.gender = currentData.gender;
-    currentUserData.phone = currentData.phone;
-    currentUserData.email = currentData.email;
+    currentUserData.gender = currentData.gender; currentUserData.phone = currentData.phone; currentUserData.email = currentData.email;
 
     await window.setDoc(window.doc(window.db, "users", currentUserId), { 
         name: currentUserData.name, major: currentUserData.major, gender: currentUserData.gender, phone: currentUserData.phone, email: currentUserData.email 
     }, {merge:true});
     
-    window.profileSnapshot = JSON.stringify(currentData);
-    updateMainUI(); // تحديث الاسم والتخصص في الرئيسية
-    showToast();
+    window.profileSnapshot = JSON.stringify(currentData); updateMainUI(); showToast();
 }
 
-window.logout = function() {
-    if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-        localStorage.removeItem('local_uid');
-        location.reload();
-    }
-}
+window.logout = function() { if(confirm("هل أنت متأكد من تسجيل الخروج؟")) { localStorage.removeItem('local_uid'); location.reload(); } }
 </script>
 </body>
 </html>
