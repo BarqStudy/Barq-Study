@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة القيادة | برق المتعلم</title>
+<title>لوحة القيادة المتقدمة | برق المتعلم</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;800&display=swap" rel="stylesheet">
 
 <script type="module">
@@ -50,6 +50,7 @@ tr:hover { background: rgba(255,255,255,0.02); }
 .form-group { margin-bottom: 15px; text-align: right; }
 label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-muted); }
 input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: var(--text-main); font-size: 1rem; }
+select option { background: var(--bg-color); color: var(--text-main); }
 
 button { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
 .btn-danger { background: var(--danger); }
@@ -58,7 +59,7 @@ button { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bol
 .btn-danger:hover { background: #DC2626; }
 .btn-success:hover { background: #059669; }
 
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 10px; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 10px; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000; }
 .toast.show { opacity: 1; }
 
 .pulse-anim { animation: pulse 2s infinite ease-in-out; }
@@ -87,22 +88,42 @@ button { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bol
         </div>
     </div>
 
-    <!-- قسم إضافة وتعديل الجامعات -->
+    <!-- إدارة الجامعات والكليات والتخصصات المترابطة -->
     <div class="glass-panel">
-        <h2>إدارة الجامعات والكليات والتخصصات 🏛️</h2>
+        <h2>إدارة الأكاديميات (الجامعات والكليات والتخصصات) 🏛️</h2>
+        
         <div class="form-group">
-            <label>اختر الجامعة أو أضف جديدة</label>
-            <input type="text" id="uni-name" placeholder="اسم الجامعة (مثال: جامعة نجران)">
+            <label>1. اختر الجامعة أو أضف جديدة</label>
+            <select id="admin-uni-select" onchange="onAdminUniChange()">
+                <option value="">-- اختر جامعة أو أضف جديدة --</option>
+                <option value="__NEW__">➕ إضافة جامعة جديدة...</option>
+            </select>
         </div>
+
+        <div class="form-group" id="new-uni-group" style="display:none;">
+            <label>اسم الجامعة الجديدة</label>
+            <input type="text" id="new-uni-name" placeholder="مثال: جامعة الملك سعود">
+        </div>
+
         <div class="form-group">
-            <label>اسم الكلية</label>
-            <input type="text" id="college-name" placeholder="اسم الكلية (مثال: الهندسة)">
+            <label>2. الكلية</label>
+            <select id="admin-college-select" onchange="onAdminCollegeChange()" disabled>
+                <option value="">-- اختر الجامعة أولاً --</option>
+                <option value="__NEW__">➕ إضافة كلية جديدة...</option>
+            </select>
         </div>
+
+        <div class="form-group" id="new-college-group" style="display:none;">
+            <label>اسم الكلية الجديدة</label>
+            <input type="text" id="new-college-name" placeholder="مثال: الهندسة">
+        </div>
+
         <div class="form-group">
-            <label>التخصصات (افصل بينها بفواصل , )</label>
-            <input type="text" id="majors-list" placeholder="هندسة ميكانيكية, هندسة مدنية, هندسة كهربائية">
+            <label>3. التخصصات (اكتب التخصص واضغط إضافة أو افصل بينها بفواصل , )</label>
+            <input type="text" id="admin-majors-input" placeholder="هندسة ميكانيكية, هندسة مدنية">
         </div>
-        <button class="btn-primary" onclick="saveUniversityData()">إضافة أو تحديث في النظام 💾</button>
+
+        <button class="btn-primary" onclick="saveAdminHierarchy()">حفظ وإضافة للنظام 💾</button>
     </div>
 
     <!-- جدول المستخدمين -->
@@ -129,7 +150,12 @@ button { padding: 10px 20px; border-radius: 12px; border: none; font-weight: bol
 </div>
 
 <script>
-window.addEventListener('firebaseReady', () => { loadData(); });
+let globalUnisData = {};
+
+window.addEventListener('firebaseReady', () => { 
+    loadData(); 
+    loadAdminUniversities(); 
+});
 
 function showToast(msg) {
     const t = document.getElementById('toast');
@@ -141,7 +167,6 @@ function showToast(msg) {
 async function loadData() {
     try {
         const usersSnap = await window.getDocs(window.query(window.collection(window.db, "users"), window.orderBy("currentStreak", "desc")));
-        
         let totalUsers = 0, totalMins = 0, html = '';
 
         usersSnap.forEach(docSnap => {
@@ -171,35 +196,102 @@ async function loadData() {
         document.getElementById('total-users').innerText = totalUsers;
         document.getElementById('total-hours').innerText = (totalMins / 60).toFixed(1);
         document.getElementById('users-table-body').innerHTML = html || '<tr><td colspan="6" style="text-align:center;">لا توجد بيانات.</td></tr>';
-
     } catch(e) { console.error(e); }
 }
 
-// حفظ بيانات الجامعات في فايربيس
-window.saveUniversityData = async function() {
-    const uni = document.getElementById('uni-name').value.trim();
-    const college = document.getElementById('college-name').value.trim();
-    const majorsInput = document.getElementById('majors-list').value.trim();
+// جلب الهيكلة للوحة الأدمن
+async function loadAdminUniversities() {
+    try {
+        const docSnap = await window.getDoc(window.doc(window.db, "settings", "universities"));
+        if(docSnap.exists()) {
+            globalUnisData = docSnap.data();
+        } else {
+            globalUnisData = {
+                "جامعة نجران": {
+                    "الهندسة": ["هندسة ميكانيكية", "هندسة مدنية"]
+                }
+            };
+        }
+        
+        const uniSelect = document.getElementById('admin-uni-select');
+        uniSelect.innerHTML = '<option value="">-- اختر جامعة أو أضف جديدة --</option><option value="__NEW__">➕ إضافة جامعة جديدة...</option>';
+        for(let u in globalUnisData) {
+            uniSelect.innerHTML += `<option value="${u}">${u}</option>`;
+        }
+    } catch(e) { console.error(e); }
+}
 
-    if(!uni || !college || !majorsInput) return alert('يرجى تعبئة جميع الحقول!');
+window.onAdminUniChange = function() {
+    const val = document.getElementById('admin-uni-select').value;
+    const newUniGroup = document.getElementById('new-uni-group');
+    const collegeSelect = document.getElementById('admin-college-select');
+    
+    if(val === '__NEW__') {
+        newUniGroup.style.display = 'block';
+        collegeSelect.innerHTML = '<option value="__NEW__">➕ إضافة كلية جديدة...</option>';
+        collegeSelect.disabled = false;
+        document.getElementById('new-college-group').style.display = 'block';
+    } else {
+        newUniGroup.style.display = 'none';
+        document.getElementById('new-college-group').style.display = 'none';
+        if(val && globalUnisData[val]) {
+            collegeSelect.innerHTML = '<option value="">-- اختر الكلية --</option><option value="__NEW__">➕ إضافة كلية جديدة...</option>';
+            for(let c in globalUnisData[val]) {
+                collegeSelect.innerHTML += `<option value="${c}">${c}</option>`;
+            }
+            collegeSelect.disabled = false;
+        } else {
+            collegeSelect.innerHTML = '<option value="">-- اختر الجامعة أولاً --</option>';
+            collegeSelect.disabled = true;
+        }
+    }
+}
 
-    const majorsArray = majorsInput.split(',').map(m => m.trim()).filter(m => m.length > 0);
+window.onAdminCollegeChange = function() {
+    const val = document.getElementById('admin-college-select').value;
+    const newCollegeGroup = document.getElementById('new-college-group');
+    if(val === '__NEW__') {
+        newCollegeGroup.style.display = 'block';
+    } else {
+        newCollegeGroup.style.display = 'none';
+    }
+}
+
+// حفظ الإضافات في فايربيس
+window.saveAdminHierarchy = async function() {
+    let uni = document.getElementById('admin-uni-select').value;
+    if(uni === '__NEW__') {
+        uni = document.getElementById('new-uni-name').value.trim();
+    }
+
+    let college = document.getElementById('admin-college-select').value;
+    if(college === '__NEW__' || document.getElementById('new-college-group').style.display === 'block') {
+        college = document.getElementById('new-college-name').value.trim();
+    }
+
+    const majorsInput = document.getElementById('admin-majors-input').value.trim();
+
+    if(!uni || !college || !majorsInput) return alert('يرجى اختيار/إكمال بيانات الجامعة والكلية والتخصصات!');
+
+    const newMajors = majorsInput.split(',').map(m => m.trim()).filter(m => m.length > 0);
 
     try {
-        // جلب البيانات الحالية من قاعدة البيانات إن وجدت
-        const docRef = window.doc(window.db, "settings", "universities");
-        const docSnap = await window.getDoc(docRef);
-        
-        let uniData = docSnap.exists() ? docSnap.data() : {};
+        if(!globalUnisData[uni]) globalUnisData[uni] = {};
+        if(!globalUnisData[uni][college]) globalUnisData[uni][college] = [];
 
-        if(!uniData[uni]) uniData[uni] = {};
-        uniData[uni][college] = majorsArray;
+        // دمج التخصصات الجديدة مع القديمة بدون تكرار
+        let existingMajors = globalUnisData[uni][college];
+        newMajors.forEach(m => {
+            if(!existingMajors.includes(m)) existingMajors.push(m);
+        });
 
-        await window.setDoc(docRef, uniData);
-        showToast('تمت إضافة الجامعة/الكلية بنجاح وتحديثها للطلاب فوراً! 🎓');
-        
-        document.getElementById('college-name').value = '';
-        document.getElementById('majors-list').value = '';
+        await window.setDoc(window.doc(window.db, "settings", "universities"), globalUnisData);
+        showToast('تم حفظ التحديثات وإضافتها بنجاح لجميع الطلاب! 🎓');
+
+        // إعادة تعيين الحقول الفرعية
+        document.getElementById('admin-majors-input').value = '';
+        document.getElementById('new-college-name').value = '';
+        loadAdminUniversities();
     } catch(e) {
         console.error(e);
         alert('حدث خطأ أثناء الحفظ');
