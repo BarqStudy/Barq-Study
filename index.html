@@ -179,6 +179,10 @@ button:active { transform: scale(0.96); }
             <div style="text-align:left; opacity: 0.8;"><div class="subtitle">القادم ➔</div><div style="font-weight:700; color:var(--primary);" id="next-level-name">شعلة الإنجاز</div></div>
         </div>
         <div class="progress-container"><div class="progress-bar" id="level-progress-bar"></div></div>
+        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.8rem; color:var(--text-muted);">
+            <span id="remaining-hours-text">0 س</span>
+            <span id="current-hours-text">0 س</span>
+        </div>
     </div>
 
     <div class="menu-grid" id="main-services-grid">
@@ -199,7 +203,7 @@ button:active { transform: scale(0.96); }
         
         <div id="acc-list-view" style="width: 100%;">
             <div id="acc-global-progress" style="width: 100%;"></div>
-            <button class="btn-secondary" style="margin-bottom:15px; border-style:dashed;" onclick="toggleAcc('form')">+ أضف مادة</button>
+            <button class="btn-secondary" style="margin-bottom:15px; border-style:dashed;" onclick="openAccForm()">+ أضف مادة</button>
             <div id="saved-courses-list" style="width: 100%;"></div>
         </div>
 
@@ -330,9 +334,8 @@ button:active { transform: scale(0.96); }
 
 <script>
 // ==========================================
-// 🔴 مفتاح الـ AI الإلزامي 🔴
-// ضع مفتاح الـ API الخاص بـ Gemini هنا ليعمل الذكاء الاصطناعي
-const GEMINI_API_KEY = "AQ.Ab8RN6KYuQvuOnoWRfJm4yEeAMz7JVU-jqbEquXdpynyH22ntg";
+// 🟢 عنوان الـ Worker الذي يستضيف مفتاح الذكاء الاصطناعي بأمان (بدل وضع المفتاح هنا مباشرة)
+const AI_WORKER_URL = "https://barq-study.abood-bakdalia.workers.dev";
 // ==========================================
 
 const ADMIN_ID = "791769102695"; 
@@ -364,7 +367,6 @@ const FOCUS_LEVELS = [ { hours: 0, icon: '⚡', name: 'شرارة البداية
 const WEEK_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
 let currentScheduleEdit = {}, currentScheduleDay = 'الأحد'; 
 let timerInt = null, totalSecs = 0, isPaused = false, studyMins = 0, breakMins = 0, isBreakPhase = false, timerEndTime = 0;
-window.profileSnapshot = "";
 
 // ================= دوال التحويل للـ AI =================
 function fileToBase64(file) {
@@ -395,14 +397,13 @@ window.openAIAssistant = function() {
 window.processAIPlanFile = async function() {
     const fileInput = document.getElementById('ai-file-input');
     if(fileInput.files.length === 0) return;
-    if(!GEMINI_API_KEY || GEMINI_API_KEY.includes("ضع_مفتاح")) return alert("لم يتم ضبط مفتاح الـ AI بعد!");
 
     const file = fileInput.files[0];
     showToast('🤖 جاري قراءة وتلخيص المنهج بالـ AI...');
     
     try {
         const base64Data = await fileToBase64(file);
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(AI_WORKER_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [
@@ -433,14 +434,13 @@ window.openAIScheduleAssistant = function() {
 window.processAIScheduleFile = async function() {
     const fileInput = document.getElementById('ai-schedule-file');
     if(fileInput.files.length === 0) return;
-    if(!GEMINI_API_KEY || GEMINI_API_KEY.includes("ضع_مفتاح")) return alert("لم يتم ضبط مفتاح الـ AI بعد!");
 
     const file = fileInput.files[0];
     showToast('🤖 جاري تفريغ الجدول بالـ AI... (قد يستغرق 10 ثواني)');
 
     try {
         const base64Data = await fileToBase64(file);
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(AI_WORKER_URL, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [
@@ -577,11 +577,48 @@ function saveTimerState() { localStorage.setItem('timerEndTime', timerEndTime); 
 function clearTimerState() { localStorage.removeItem('timerEndTime'); localStorage.removeItem('studyMins'); localStorage.removeItem('breakMins'); localStorage.removeItem('isBreakPhase'); localStorage.removeItem('isPaused'); localStorage.removeItem('pausedRemaining'); }
 function checkPersistedTimer() {
     let savedEnd = localStorage.getItem('timerEndTime'), savedPaused = localStorage.getItem('isPaused') === 'true';
-    if(savedEnd || savedPaused) {
-        studyMins = parseInt(localStorage.getItem('studyMins')) || 25; breakMins = parseInt(localStorage.getItem('breakMins')) || 0; isBreakPhase = localStorage.getItem('isBreakPhase') === 'true';
-        if(savedPaused) { isPaused = true; totalSecs = parseInt(localStorage.getItem('pausedRemaining')) || 0; document.getElementById('pause-btn').innerText = '▶️ إكمال'; } else { timerEndTime = parseInt(savedEnd); totalSecs = Math.round((timerEndTime - Date.now()) / 1000); isPaused = false; document.getElementById('pause-btn').innerText = '⏸️ إيقاف'; }
-        if(totalSecs > 0) { if(isBreakPhase) { document.getElementById('timer-title').innerText = "وقت الاستراحة ☕"; document.getElementById('timer-icon').innerText = '☕'; document.getElementById('skip-break-btn').style.display = 'block'; } else { document.getElementById('timer-title').innerText = "مذاكرة عميقة..."; document.getElementById('timer-icon').innerText = '⏳'; document.getElementById('skip-break-btn').style.display = 'none'; } updateTimerDisplay(); clearInterval(timerInt); timerInt = setInterval(tickTimer, 1000); } else { clearTimerState(); if(!isBreakPhase) handleSessionComplete(studyMins, true); }
-    } else { navTo('main-screen', 'nav-home'); }
+    if(!savedEnd && !savedPaused) { navTo('main-screen', 'nav-home'); return; }
+
+    studyMins = parseInt(localStorage.getItem('studyMins')) || 25;
+    breakMins = parseInt(localStorage.getItem('breakMins')) || 0;
+    isBreakPhase = localStorage.getItem('isBreakPhase') === 'true';
+
+    if(savedPaused) {
+        isPaused = true;
+        totalSecs = parseInt(localStorage.getItem('pausedRemaining')) || 0;
+    } else {
+        isPaused = false;
+        timerEndTime = parseInt(savedEnd);
+        totalSecs = Math.round((timerEndTime - Date.now()) / 1000);
+
+        // إذا كان التطبيق مغلقاً لفترة أطول من الوقت المتبقي، نكمل مرور المراحل (مذاكرة/استراحة) بدلاً من التعليق
+        while(totalSecs <= 0) {
+            if(!isBreakPhase) {
+                handleSessionComplete(studyMins, false);
+                if(breakMins > 0) {
+                    isBreakPhase = true;
+                    timerEndTime += breakMins * 60000;
+                    totalSecs = Math.round((timerEndTime - Date.now()) / 1000);
+                } else {
+                    clearTimerState();
+                    navTo('main-screen', 'nav-home');
+                    return;
+                }
+            } else {
+                clearTimerState();
+                navTo('main-screen', 'nav-home');
+                return;
+            }
+        }
+    }
+
+    document.getElementById('pause-btn').innerText = isPaused ? '▶️ إكمال' : '⏸️ إيقاف';
+    if(isBreakPhase) { document.getElementById('timer-title').innerText = "وقت الاستراحة ☕"; document.getElementById('timer-icon').innerText = '☕'; document.getElementById('skip-break-btn').style.display = 'block'; }
+    else { document.getElementById('timer-title').innerText = "مذاكرة عميقة..."; document.getElementById('timer-icon').innerText = '⏳'; document.getElementById('skip-break-btn').style.display = 'none'; }
+    saveTimerState();
+    updateTimerDisplay();
+    navTo('pomodoro-screen');
+    if(!isPaused) { clearInterval(timerInt); timerInt = setInterval(tickTimer, 1000); }
 }
 window.openPomodoro = function() { if(localStorage.getItem('timerEndTime') || localStorage.getItem('isPaused') === 'true') { navTo('pomodoro-screen'); } else { navTo('pomodoro-setup-screen'); } }
 window.startFocusTimer = function() { studyMins = parseInt(document.getElementById('study-mins').value) || 25; breakMins = parseInt(document.getElementById('break-mins').value) || 0; totalSecs = studyMins * 60; isPaused = false; isBreakPhase = false; timerEndTime = Date.now() + (totalSecs * 1000); saveTimerState(); document.getElementById('pause-btn').innerText = '⏸️ إيقاف'; document.getElementById('timer-title').innerText = "مذاكرة عميقة..."; document.getElementById('timer-icon').innerText = '⏳'; document.getElementById('skip-break-btn').style.display = 'none'; updateTimerDisplay(); navTo('pomodoro-screen'); clearInterval(timerInt); timerInt = setInterval(tickTimer, 1000); }
@@ -623,6 +660,7 @@ async function handleSessionComplete(mins, navigateAway = true) {
 
 // ================= لا للتسويف =================
 window.toggleAcc = function(view) { document.getElementById('acc-list-view').style.display = 'none'; document.getElementById('acc-form-view').style.display = 'none'; document.getElementById('acc-plan-result').style.display = 'none'; if(view === 'result') { document.getElementById('acc-plan-result').style.display = 'block'; } else { document.getElementById(`acc-${view}-view`).style.display = 'block'; } }
+window.openAccForm = function() { document.getElementById('acc-course').value = ''; document.getElementById('acc-chapters').value = ''; document.getElementById('acc-days').value = ''; document.getElementById('acc-hours').value = 1.5; toggleAcc('form'); }
 window.openAccumulation = function() {
     const listDiv = document.getElementById('saved-courses-list'); const globalProgressDiv = document.getElementById('acc-global-progress'); const plans = currentUserData.accPlans || [];
     let totalChaps = 0, doneChaps = 0; plans.forEach(p => { totalChaps += p.chaptersData.length; doneChaps += p.chaptersData.filter(c => c.done).length; }); const globalPct = totalChaps ? Math.round((doneChaps/totalChaps)*100) : 0;
@@ -694,12 +732,9 @@ window.navToProfile = function() {
     try {
         document.getElementById('prof-handle').value = currentUserData.handle || ("@" + telegramUsername);
         document.getElementById('prof-name').value = currentUserData.name || '';
-        document.getElementById('prof-uni').innerHTML = `<option value="${currentUserData.university}">${currentUserData.university}</option>`;
-        document.getElementById('prof-college').innerHTML = `<option value="${currentUserData.college}">${currentUserData.college}</option>`;
-        document.getElementById('prof-major').innerHTML = `<option value="${currentUserData.major}">${currentUserData.major}</option>`;
+        initCascadingDropdowns('prof-uni', 'prof-college', 'prof-major', currentUserData.university, currentUserData.college, currentUserData.major);
         document.getElementById('font-size-slider').value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--base-font-size')) || 15;
-        
-        window.profileSnapshot = JSON.stringify({ name: document.getElementById('prof-name').value.trim() });
+
         navTo('profile-screen', 'nav-profile');
     } catch (e) {
         console.error(e); showToast('حدث خطأ أثناء فتح الملف الشخصي');
@@ -707,9 +742,17 @@ window.navToProfile = function() {
 }
 window.saveProfile = async function() {
     const newName = document.getElementById('prof-name').value.trim();
-    if(newName === currentUserData.name) { showToast('لا يوجد تعديلات لحفظها ℹ️'); return; }
-    currentUserData.name = newName;
-    await window.setDoc(window.doc(window.db, "users", currentUserId), { name: currentUserData.name }, {merge:true});
+    const newUni = document.getElementById('prof-uni').value;
+    const newCollege = document.getElementById('prof-college').value;
+    const newMajor = document.getElementById('prof-major').value;
+    if(!newName || !newUni || !newCollege || !newMajor) return showToast('يرجى تعبئة جميع البيانات!');
+
+    const changed = newName !== currentUserData.name || newUni !== currentUserData.university || newCollege !== currentUserData.college || newMajor !== currentUserData.major;
+    if(!changed) { showToast('لا يوجد تعديلات لحفظها ℹ️'); return; }
+
+    currentUserData.name = newName; currentUserData.university = newUni; currentUserData.college = newCollege; currentUserData.major = newMajor;
+    await window.setDoc(window.doc(window.db, "users", currentUserId), { name: newName, university: newUni, college: newCollege, major: newMajor }, {merge:true});
+    applyUniversityFeatures(newUni);
     updateMainUI(); showToast('تم تحديث بياناتك 👤');
 }
 window.logout = function() { if(confirm("هل أنت متأكد من تسجيل الخروج؟")) { localStorage.removeItem('local_uid'); location.reload(); } }
