@@ -21,90 +21,62 @@ window.dispatchEvent(new Event('firebaseReady'));
 :root { --primary: #2563EB; --bg-color: #0B1120; --glass-bg: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); --text-main: #F3F4F6; --text-muted: #9CA3AF; --danger: #EF4444; --success: #10B981; }
 * { margin:0; padding:0; box-sizing:border-box; font-family:'IBM Plex Sans Arabic',sans-serif; }
 body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 40px 20px; min-height: 100vh; }
-.container { width: 100%; max-width: 1000px; display: none; }
+.container { width: 100%; max-width: 1100px; display: none; }
 .login-container { width: 100%; max-width: 400px; margin: auto; }
-.glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); }
+.glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); }
 h1, h2, h3 { font-weight: 800; margin-bottom: 20px; text-align: center; }
 .form-group { margin-bottom: 15px; text-align: right; }
 label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-muted); }
 input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: var(--text-main); font-size: 1rem; }
-button { padding: 12px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; width: 100%; font-size: 1rem; }
-.btn-primary { background: var(--primary); } .btn-danger { background: var(--danger); width: auto;} .btn-success { background: var(--success); width: auto;}
+button { padding: 10px 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; }
+.btn-primary { background: var(--primary); width: 100%; padding: 14px;} .btn-danger { background: var(--danger); } .btn-success { background: var(--success); }
+.btn-warning { background: #F59E0B; color: #000; }
 .btn-primary:hover { filter: brightness(1.2); }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { padding: 15px; text-align: right; border-bottom: 1px solid var(--glass-border); } th { color: var(--primary); }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; } th, td { padding: 12px; text-align: right; border-bottom: 1px solid var(--glass-border); } th { color: var(--primary); }
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 10px; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000; }
 .toast.show { opacity: 1; }
+.badge-pro { background: linear-gradient(45deg, #FFD700, #F59E0B); color: #000; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 900; }
+.badge-free { background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <div id="toast" class="toast">تم ✅</div>
 
-<!-- شاشة تسجيل الدخول -->
 <div class="login-container glass-panel" id="login-screen">
     <h1>تسجيل <span style="color:#60A5FA;">الدخول</span> ⚡</h1>
     <div class="form-group"><label>اسم المستخدم</label><input type="text" id="admin-user"></div>
     <div class="form-group"><label>كلمة المرور</label><input type="password" id="admin-pass"></div>
-    <button class="btn-primary" onclick="loginAdmin()">دخول للوحة التحكم</button>
+    <button class="btn-primary" onclick="loginAdmin()">دخول</button>
 </div>
 
-<!-- لوحة التحكم الرئيسية -->
 <div class="container" id="admin-dashboard">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
         <h1 style="margin:0;">اللوحة <span style="color:#60A5FA;">المركزية</span></h1>
         <div><button class="btn-success" onclick="loadData()">تحديث 🔄</button> <button class="btn-danger" onclick="logoutAdmin()">خروج 🚪</button></div>
     </div>
 
-    <!-- قسم الحماية -->
-    <div class="glass-panel" style="border-color: rgba(245, 158, 11, 0.3);">
-        <h2 style="color: #F59E0B;">تغيير بيانات الدخول 🔐</h2>
-        <div style="display:flex; gap:10px;">
-            <div class="form-group" style="flex:1;"><input type="text" id="new-admin-user" placeholder="اسم المستخدم الجديد"></div>
-            <div class="form-group" style="flex:1;"><input type="text" id="new-admin-pass" placeholder="كلمة المرور الجديدة"></div>
-        </div>
-        <button class="btn-primary" onclick="updateAdminCredentials()">حفظ البيانات الجديدة</button>
+    <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div class="glass-panel" style="text-align: center; margin:0;"><div style="font-size:2.5rem; font-weight:800; color:#60A5FA;" id="total-users">0</div><div style="color:var(--text-muted);">إجمالي الطلاب</div></div>
+        <div class="glass-panel" style="text-align: center; margin:0;"><div style="font-size:2.5rem; font-weight:800; color:#60A5FA;" id="total-hours">0</div><div style="color:var(--text-muted);">ساعات المنصة</div></div>
     </div>
 
-    <!-- إدارة الجامعات والكليات والتخصصات المترابطة -->
     <div class="glass-panel">
-        <h2>إدارة الأكاديميات (الجامعات والكليات والتخصصات) 🏛️</h2>
-        <div class="form-group">
-            <label>1. اختر الجامعة أو أضف جديدة</label>
-            <select id="admin-uni-select" onchange="onAdminUniChange()">
-                <option value="">-- اختر جامعة أو أضف جديدة --</option>
-                <option value="__NEW__">➕ إضافة جامعة جديدة...</option>
-            </select>
-        </div>
-        <div class="form-group" id="new-uni-group" style="display:none;"><input type="text" id="new-uni-name" placeholder="مثال: جامعة الملك سعود"></div>
-        <div class="form-group">
-            <label>2. الكلية</label>
-            <select id="admin-college-select" onchange="onAdminCollegeChange()" disabled>
-                <option value="">-- اختر الجامعة أولاً --</option><option value="__NEW__">➕ إضافة كلية جديدة...</option>
-            </select>
-        </div>
-        <div class="form-group" id="new-college-group" style="display:none;"><input type="text" id="new-college-name" placeholder="مثال: الهندسة"></div>
-        <div class="form-group">
-            <label>3. التخصصات (افصل بينها بفواصل , )</label>
-            <input type="text" id="admin-majors-input" placeholder="هندسة ميكانيكية, هندسة مدنية">
-        </div>
-        <button class="btn-primary" onclick="saveAdminHierarchy()">حفظ وإضافة للنظام 💾</button>
+        <h2>إدارة الأكاديميات (إضافة جامعة/كلية)</h2>
+        <div class="form-group"><select id="admin-uni-select" onchange="onAdminUniChange()"><option value="">-- اختر جامعة --</option><option value="__NEW__">➕ جامعة جديدة...</option></select></div>
+        <div class="form-group" id="new-uni-group" style="display:none;"><input type="text" id="new-uni-name" placeholder="اسم الجامعة الجديدة"></div>
+        <div class="form-group"><select id="admin-college-select" onchange="onAdminCollegeChange()" disabled><option value="">-- اختر الجامعة أولاً --</option><option value="__NEW__">➕ كلية جديدة...</option></select></div>
+        <div class="form-group" id="new-college-group" style="display:none;"><input type="text" id="new-college-name" placeholder="اسم الكلية الجديدة"></div>
+        <div class="form-group"><input type="text" id="admin-majors-input" placeholder="التخصصات (افصل بينها بفاصلة , )"></div>
+        <button class="btn-primary" onclick="saveAdminHierarchy()">حفظ الأكاديمية 💾</button>
     </div>
 
-    <div class="glass-panel" style="border-color: rgba(239, 68, 68, 0.3);">
-        <h2 style="color: var(--danger);">حذف جامعة أو كلية أو تخصص 🗑️</h2>
-        <div class="form-group"><select id="del-uni-select" onchange="onDelUniChange()"><option value="">-- اختر الجامعة --</option></select></div>
-        <div class="form-group"><select id="del-college-select" onchange="onDelCollegeChange()" disabled><option value="">-- اختر الكلية --</option></select></div>
-        <div class="form-group"><select id="del-major-select" disabled><option value="">-- اختر التخصص --</option></select></div>
-        <button class="btn-danger" style="width:100%;" onclick="deleteAcademicItem()">حذف المحدد من النظام ⚠️</button>
-    </div>
-
-    <!-- جدول المستخدمين -->
     <div class="glass-panel">
-        <h2>سجل الطلاب المسجلين</h2>
+        <h2>سجل الطلاب (تفعيل الباقات والحظر)</h2>
         <div style="overflow-x:auto;">
             <table>
-                <thead><tr><th>الاسم</th><th>المعرف (@)</th><th>الجامعة / الكلية / التخصص</th><th>أيام الستريك</th><th>إجراءات الإدارة</th></tr></thead>
-                <tbody id="users-table-body"><tr><td colspan="5" style="text-align:center;">جاري التحميل...</td></tr></tbody>
+                <thead><tr><th>الاسم</th><th>المعرف</th><th>الجامعة</th><th>الستريك</th><th>الباقة</th><th>إجراءات الإدارة</th></tr></thead>
+                <tbody id="users-table-body"><tr><td colspan="6" style="text-align:center;">جاري التحميل...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -112,13 +84,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { pad
 
 <script>
 let globalUnisData = {};
-let currentAuth = { user: "admin", pass: "admin123" }; // الافتراضي
+let currentAuth = { user: "admin", pass: "admin123" }; 
 
 window.addEventListener('firebaseReady', async () => { 
     await checkInitialAuth();
-    if(sessionStorage.getItem('isAdmin') === 'true') {
-        showDashboard();
-    }
+    if(sessionStorage.getItem('isAdmin') === 'true') { showDashboard(); }
 });
 
 function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
@@ -126,83 +96,71 @@ function showToast(msg) { const t = document.getElementById('toast'); t.innerTex
 async function checkInitialAuth() {
     try {
         const docSnap = await window.getDoc(window.doc(window.db, "settings", "adminAuth"));
-        if(docSnap.exists()) { currentAuth = docSnap.data(); } 
-        else { await window.setDoc(window.doc(window.db, "settings", "adminAuth"), currentAuth); }
+        if(docSnap.exists()) { currentAuth = docSnap.data(); } else { await window.setDoc(window.doc(window.db, "settings", "adminAuth"), currentAuth); }
     } catch(e) { console.error(e); }
 }
 
 window.loginAdmin = function() {
-    const u = document.getElementById('admin-user').value;
-    const p = document.getElementById('admin-pass').value;
-    if(u === currentAuth.user && p === currentAuth.pass) {
-        sessionStorage.setItem('isAdmin', 'true');
-        showDashboard();
-    } else {
-        alert("بيانات الدخول غير صحيحة!");
-    }
+    if(document.getElementById('admin-user').value === currentAuth.user && document.getElementById('admin-pass').value === currentAuth.pass) {
+        sessionStorage.setItem('isAdmin', 'true'); showDashboard();
+    } else { alert("بيانات الدخول غير صحيحة!"); }
 }
 
-window.logoutAdmin = function() {
-    sessionStorage.removeItem('isAdmin');
-    document.getElementById('admin-dashboard').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'block';
-}
+window.logoutAdmin = function() { sessionStorage.removeItem('isAdmin'); location.reload(); }
 
 function showDashboard() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-dashboard').style.display = 'block';
-    loadAdminUniversities();
-    loadData();
-}
-
-window.updateAdminCredentials = async function() {
-    const nu = document.getElementById('new-admin-user').value.trim();
-    const np = document.getElementById('new-admin-pass').value.trim();
-    if(!nu || !np) return alert('أدخل اسم المستخدم وكلمة المرور الجديدة!');
-    
-    currentAuth = { user: nu, pass: np };
-    await window.setDoc(window.doc(window.db, "settings", "adminAuth"), currentAuth);
-    showToast('تم تغيير بيانات الدخول بنجاح 🔐');
-    document.getElementById('new-admin-user').value = ''; document.getElementById('new-admin-pass').value = '';
+    document.getElementById('login-screen').style.display = 'none'; document.getElementById('admin-dashboard').style.display = 'block';
+    loadAdminUniversities(); loadData();
 }
 
 async function loadData() {
     try {
         const usersSnap = await window.getDocs(window.query(window.collection(window.db, "users"), window.orderBy("currentStreak", "desc")));
-        let html = '';
+        let totalUsers = 0, totalMins = 0, html = '';
         usersSnap.forEach(docSnap => {
-            const u = docSnap.data();
-            let uniPath = (u.university || '') + ' <br><small style="color:var(--text-muted);">' + (u.college || '') + ' - ' + (u.major || '') + '</small>';
+            const u = docSnap.data(); const id = docSnap.id;
+            totalUsers++; totalMins += (u.totalFocusMins || 0);
+            let uniPath = (u.university || '') + '<br><small style="color:var(--text-muted);">' + (u.major || '') + '</small>';
+            let proBadge = u.isPro ? '<span class="badge-pro">PRO ✨</span>' : '<span class="badge-free">مجاني</span>';
+            let proBtn = u.isPro ? `<button class="btn-danger" onclick="togglePro('${id}', false)">إلغاء البرو</button>` : `<button class="btn-warning" onclick="togglePro('${id}', true)">تفعيل برو 🌟</button>`;
+            
             html += `<tr>
                 <td style="font-weight:bold;">${u.name || 'مجهول'}</td>
-                <td dir="ltr" style="text-align:right; color:#60A5FA;">${u.handle || '---'}</td>
+                <td dir="ltr" style="color:#60A5FA;">${u.handle || '---'}</td>
                 <td>${uniPath}</td>
                 <td style="font-weight:bold; color:#F59E0B;">🔥 ${u.currentStreak || 0}</td>
-                <td>
-                    <button class="btn-danger" onclick="banUser('${docSnap.id}', '${u.name}')">حظر 🚫</button>
-                    <button class="btn-success" onclick="unbanUser('${docSnap.id}', '${u.name}')">فك ✅</button>
-                </td>
+                <td>${proBadge}</td>
+                <td>${proBtn} <button class="btn-danger" style="margin-right:5px;" onclick="banUser('${id}', '${u.name}')">حظر</button></td>
             </tr>`;
         });
-        document.getElementById('users-table-body').innerHTML = html || '<tr><td colspan="5" style="text-align:center;">لا توجد بيانات.</td></tr>';
+        document.getElementById('total-users').innerText = totalUsers; document.getElementById('total-hours').innerText = (totalMins / 60).toFixed(1);
+        document.getElementById('users-table-body').innerHTML = html || '<tr><td colspan="6" style="text-align:center;">لا توجد بيانات.</td></tr>';
     } catch(e) { console.error(e); }
 }
 
-// ... [نفس دوال إضافة وحذف الجامعات من الكود السابق تماماً] ...
+// تفعيل وإلغاء البرو من لوحة التحكم
+window.togglePro = async function(userId, status) {
+    if(confirm(status ? 'تفعيل باقة البرو مجاناً لهذا الطالب؟' : 'إلغاء باقة البرو من هذا الطالب؟')) {
+        await window.setDoc(window.doc(window.db, "users", userId), { isPro: status }, {merge:true});
+        showToast(status ? 'تم تفعيل البرو 🌟' : 'تم الإلغاء'); loadData();
+    }
+}
+
+window.banUser = async function(id, name) { if(confirm(`حظر (${name})؟`)) { await window.setDoc(window.doc(window.db, "banned_users", id), { banned: true }); showToast('تم الحظر 🚫'); } }
+
 async function loadAdminUniversities() {
     const docSnap = await window.getDoc(window.doc(window.db, "settings", "universities"));
     if(docSnap.exists()) globalUnisData = docSnap.data();
-    const uniSelect = document.getElementById('admin-uni-select'); const delUniSelect = document.getElementById('del-uni-select');
-    uniSelect.innerHTML = '<option value="">-- اختر جامعة أو أضف جديدة --</option><option value="__NEW__">➕ إضافة جامعة جديدة...</option>';
-    delUniSelect.innerHTML = '<option value="">-- اختر الجامعة للحذف --</option>';
-    for(let u in globalUnisData) { uniSelect.innerHTML += `<option value="${u}">${u}</option>`; delUniSelect.innerHTML += `<option value="${u}">${u}</option>`; }
+    const uniSelect = document.getElementById('admin-uni-select');
+    uniSelect.innerHTML = '<option value="">-- اختر جامعة --</option><option value="__NEW__">➕ إضافة جامعة جديدة...</option>';
+    for(let u in globalUnisData) { uniSelect.innerHTML += `<option value="${u}">${u}</option>`; }
 }
 window.onAdminUniChange = function() {
     const val = document.getElementById('admin-uni-select').value; const colSel = document.getElementById('admin-college-select');
-    if(val === '__NEW__') { document.getElementById('new-uni-group').style.display = 'block'; colSel.innerHTML = '<option value="__NEW__">➕ إضافة كلية جديدة...</option>'; colSel.disabled = false; document.getElementById('new-college-group').style.display = 'block'; } 
+    if(val === '__NEW__') { document.getElementById('new-uni-group').style.display = 'block'; colSel.innerHTML = '<option value="__NEW__">➕ كلية جديدة...</option>'; colSel.disabled = false; document.getElementById('new-college-group').style.display = 'block'; } 
     else {
         document.getElementById('new-uni-group').style.display = 'none'; document.getElementById('new-college-group').style.display = 'none';
-        if(val && globalUnisData[val]) { colSel.innerHTML = '<option value="">-- اختر الكلية --</option><option value="__NEW__">➕ إضافة كلية جديدة...</option>'; for(let c in globalUnisData[val]) { colSel.innerHTML += `<option value="${c}">${c}</option>`; } colSel.disabled = false; } 
+        if(val && globalUnisData[val]) { colSel.innerHTML = '<option value="">-- اختر الكلية --</option><option value="__NEW__">➕ كلية جديدة...</option>'; for(let c in globalUnisData[val]) { colSel.innerHTML += `<option value="${c}">${c}</option>`; } colSel.disabled = false; } 
         else { colSel.innerHTML = '<option value="">-- اختر الجامعة أولاً --</option>'; colSel.disabled = true; }
     }
 }
@@ -217,28 +175,6 @@ window.saveAdminHierarchy = async function() {
     newMajors.forEach(m => { if(!globalUnisData[uni][college].includes(m)) globalUnisData[uni][college].push(m); });
     await window.setDoc(window.doc(window.db, "settings", "universities"), globalUnisData); showToast('تم الحفظ 🎓'); loadAdminUniversities();
 }
-window.onDelUniChange = function() {
-    const uni = document.getElementById('del-uni-select').value; const colSel = document.getElementById('del-college-select'); const majSel = document.getElementById('del-major-select');
-    colSel.innerHTML = '<option value="">-- اختر الكلية --</option>'; majSel.innerHTML = '<option value="">-- اختر التخصص --</option>'; colSel.disabled = true; majSel.disabled = true;
-    if(uni && globalUnisData[uni]) { for(let c in globalUnisData[uni]) { colSel.innerHTML += `<option value="${c}">${c}</option>`; } colSel.disabled = false; }
-}
-window.onDelCollegeChange = function() {
-    const uni = document.getElementById('del-uni-select').value; const col = document.getElementById('del-college-select').value; const majSel = document.getElementById('del-major-select');
-    majSel.innerHTML = '<option value="">-- اختر التخصص --</option>'; majSel.disabled = true;
-    if(uni && col && globalUnisData[uni][col]) { globalUnisData[uni][col].forEach(m => { majSel.innerHTML += `<option value="${m}">${m}</option>`; }); majSel.disabled = false; }
-}
-window.deleteAcademicItem = async function() {
-    const uni = document.getElementById('del-uni-select').value; const col = document.getElementById('del-college-select').value; const maj = document.getElementById('del-major-select').value;
-    if(!uni) return;
-    if(confirm('متأكد من الحذف؟')) {
-        if(uni && col && maj) { globalUnisData[uni][col] = globalUnisData[uni][col].filter(m => m !== maj); } 
-        else if(uni && col && !maj) { delete globalUnisData[uni][col]; } 
-        else if(uni && !col && !maj) { delete globalUnisData[uni]; }
-        await window.setDoc(window.doc(window.db, "settings", "universities"), globalUnisData); showToast('تم الحذف 🗑️'); loadAdminUniversities();
-    }
-}
-window.banUser = async function(id, name) { if(confirm(`حظر (${name})؟`)) { await window.setDoc(window.doc(window.db, "banned_users", id), { banned: true }); showToast('تم الحظر 🚫'); } }
-window.unbanUser = async function(id, name) { if(confirm(`فك الحظر عن (${name})؟`)) { await window.setDoc(window.doc(window.db, "banned_users", id), { banned: false }); showToast('تم فك الحظر ✅'); } }
 </script>
 </body>
 </html>
