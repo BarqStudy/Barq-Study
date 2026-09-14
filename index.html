@@ -238,7 +238,7 @@ button:active { transform: scale(0.96); }
     </div>
 </div>
 
-<!-- 5. الجدول الدراسي (مع الـ AI) -->
+<!-- 5. الجدول الدراسي -->
 <div id="schedule-screen" class="page-screen slide-in">
     <button class="btn-floating btn-back" onclick="navTo('main-screen', 'nav-home')">➔</button>
     <div class="glass-card" style="margin-top:15px; text-align:center;">
@@ -350,8 +350,9 @@ button:active { transform: scale(0.96); }
 
 <script>
 // ==========================================
-// 🟢 رابط الـ Worker الخفي والآمن لمعالجة ميزات الـ AI 
-const WORKER_URL = "/gemini";// ==========================================
+// 🔴 مفتاح الـ AI (مباشر وسريع) 🔴
+const GEMINI_API_KEY = "AQ.Ab8RN6IVaOACF_dIN3Zu-euWdwQNPeEiqVRf31lFe_eQ5Cos7wا";
+// ==========================================
 
 const ADMIN_ID = "791769102695"; 
 let currentUserId = null, currentUserData = null, telegramUsername = "";
@@ -383,7 +384,7 @@ const WEEK_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأر
 let currentScheduleEdit = {}, currentScheduleDay = 'الأحد'; 
 let timerInt = null, totalSecs = 0, isPaused = false, studyMins = 0, breakMins = 0, isBreakPhase = false, timerEndTime = 0;
 
-// ================= دوال التحويل للـ AI عبر الـ Worker =================
+// ================= دوال التحويل للـ AI =================
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -393,19 +394,23 @@ function fileToBase64(file) {
     });
 }
 
-// الدالة المركزية لإرسال الطلب لـ Cloudflare Worker
-async function callGeminiThroughWorker(payload) {
-    const res = await fetch(WORKER_URL, {
+// الدالة المركزية للاتصال المباشر بـ Gemini
+async function callGeminiDirect(payload) {
+    if(!GEMINI_API_KEY || GEMINI_API_KEY.includes("ضع_مفتاح")) {
+        alert("لم تقم بوضع مفتاح الـ API في الكود لتعمل ميزات الذكاء الاصطناعي!");
+        throw new Error("No API Key");
+    }
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
     const data = await res.json();
-    if(data.error) throw new Error(data.error);
+    if(data.error) throw new Error(data.error.message);
     return data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '');
 }
 
-// ================= كود الخصم وميزة الـ AI =================
+// ================= كود الخصم وميزة الـ AI الحقيقية =================
 window.applyPromoCode = async function() {
     const code = document.getElementById('promo-code-input').value.trim().toUpperCase();
     if(PROMO_CODES.includes(code)) {
@@ -434,14 +439,14 @@ window.generateAIPlan = async function() {
                 { text: `قم بتحليل هذا المنهج. استخرج القيم التالية وأعدها بصيغة JSON فقط بهذا التنسيق: {"courseName":"اسم المادة","chapters":عدد الشباتر,"suggestedDays":الايام المقترحة,"hoursPerChapter":الساعات لكل شابتر}` }
             ]}]
         };
-        const aiText = await callGeminiThroughWorker(payload);
+        const aiText = await callGeminiDirect(payload);
         const aiPlan = JSON.parse(aiText);
 
         document.getElementById('acc-course').value = aiPlan.courseName || fileIn.files[0].name.split('.')[0];
         document.getElementById('acc-chapters').value = aiPlan.chapters || 5;
         document.getElementById('acc-days').value = aiPlan.suggestedDays || 7;
         document.getElementById('acc-hours').value = aiPlan.hoursPerChapter || 1.5;
-        showToast('✨ تم استخراج الخطة بنجاح!');
+        showToast('✨ تم استخراج الخطة الحقيقية بنجاح!');
     } catch (e) { console.error(e); showToast('❌ فشل التحليل، تأكد من وضوح وحجم الملف.'); }
 }
 
@@ -450,7 +455,7 @@ window.openAIScheduleAssistant = function() {
     else { document.getElementById('pro-modal').style.display = 'flex'; }
 }
 
-// 2. تحليل وتفريغ الجدول الدراسي من الصور أو الـ PDF
+// 2. تحليل وتفريغ الجدول الدراسي
 window.generateAISchedule = async function() {
     const fileIn = document.getElementById('ai-sch-file');
     if(fileIn.files.length === 0) return;
@@ -464,13 +469,14 @@ window.generateAISchedule = async function() {
                 { text: `استخرج الجدول الدراسي من هذا الملف. أعد النتيجة بصيغة JSON فقط، بدون أي نص إضافي بهذا الشكل: {"الأحد":[{"name":"اسم المادة","time":"08:00 - 09:30"}],"الإثنين":[],"الثلاثاء":[],"الأربعاء":[],"الخميس":[]}` }
             ]}]
         };
-        const aiText = await callGeminiThroughWorker(payload);
+        const aiText = await callGeminiDirect(payload);
         const aiSchedule = JSON.parse(aiText);
 
         WEEK_DAYS.forEach(day => {
             if(aiSchedule[day] && aiSchedule[day].length > 0) { currentScheduleEdit[day] = { off: false, courses: aiSchedule[day] }; } 
             else { currentScheduleEdit[day] = { off: true, courses: [] }; }
         });
+
         showToast('✨ تم تفريغ الجدول بذكاء! راجع الأيام واضغط حفظ.');
         loadDayEditForm();
     } catch (e) { console.error(e); showToast('❌ فشل تفريغ الجدول، تأكد من وضوح الصورة.'); }
@@ -495,7 +501,7 @@ window.processTranslation = async function() {
         } else {
             payload = { contents: [{ parts: [{ text: `Translate from ${source} to ${target}. Only provide the translated text without extra comments:\n\n${text}` }]}] };
         }
-        const resultText = await callGeminiThroughWorker(payload);
+        const resultText = await callGeminiDirect(payload);
         resDiv.innerText = resultText;
     } catch(e) { resDiv.innerText = '❌ فشلت الترجمة.'; console.error(e); }
 }
